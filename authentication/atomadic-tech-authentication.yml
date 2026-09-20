@@ -1,0 +1,31 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/atomadic-tech-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: X-API-Key
+  description: API key obtained from https://atomadic.tech/pay
+  sources:
+  - openapi/atomadic-tech-openapi.yml
+- name: X402PaymentProof
+  type: apiKey
+  in: header
+  parameter: X-Payment-Proof
+  description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2,
+    Polygon, or Solana)
+  sources:
+  - openapi/atomadic-tech-openapi.yml
+- name: AdminTokenAuth
+  type: apiKey
+  in: header
+  parameter: X-Admin-Token
+  description: Admin token for privileged operations
+  sources:
+  - openapi/atomadic-tech-openapi.yml

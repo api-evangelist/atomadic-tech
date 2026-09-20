@@ -1,0 +1,368 @@
+{
+  "schema_version": "1.0",
+  "name": "atomadic-fuse",
+  "description": "Atomadic Fuse v1.2.0 — deterministic per-repo monadic compiler. Curated public seed (139 atoms), 162 target languages, read-only hosted MCP.",
+  "description_plain": "In plain English: Atomadic Fuse takes a messy pile of code from many languages and turns it into one tidy, ready-to-ship package in any of 162 target languages (Rust, Python, TypeScript, Haskell, Go, and many more). Think of it like a high-quality translator + organizer for software — same idea every time, no guessing, no made-up answers. Codex-anchored confidence.",
+  "url": "https://fuse.atomadic.tech",
+  "provider": {
+    "organization": "Atomadic Tech",
+    "url": "https://atomadic.tech"
+  },
+  "version": "1.2.0",
+  "capabilities": {
+    "streaming": false,
+    "push_notifications": false,
+    "state_transition_history": true
+  },
+  "default_input_modes": [
+    "application/json",
+    "text/plain"
+  ],
+  "default_output_modes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "classify",
+      "name": "classify",
+      "description": "Classify a function by AST behavior. Returns action + confidence anchored to TAU_TRUST.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "body_text": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "body_text"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "catalog",
+      "name": "catalog",
+      "description": "Behavior-shape query against the curated public Logic-Base seed (read-only).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "doctor",
+      "name": "doctor",
+      "description": "Health probe across the hosted Fuse engine + curated public Logic-Base.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "fuse_recovery_status",
+      "name": "fuse_recovery_status",
+      "description": "Read-only Fuse recovery gate status. Hosted mirror points agents to the live local `fuse-recovery` gate.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "verify_block",
+      "name": "verify_block",
+      "description": "Anti-hallucination shield: returns a logic block with its SHA-256 verification receipt.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "block_id": {
+            "type": "string",
+            "description": "Block ID or CNAE name to verify"
+          }
+        },
+        "required": [
+          "block_id"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "search_intent",
+      "name": "search_intent",
+      "description": "Semantic intent search over the curated public seed store.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "description"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "explain_block",
+      "name": "explain_block",
+      "description": "Context-aware block explanation from the curated public seed.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "block_id": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "block_id"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "usage_stats",
+      "name": "usage_stats",
+      "description": "Token savings dashboard for the hosted public seed corpus.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "scan",
+      "name": "scan",
+      "description": "Hosted guidance to scan a local directory for CNAE atoms (no remote repo ingest).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "directory": {
+            "type": "string"
+          },
+          "languages": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "directory"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "validate",
+      "name": "validate",
+      "description": "Validate a CNAE name against the canonical action_entity_scope vocabulary.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "status",
+      "name": "status",
+      "description": "Read-only curated logic-base status from R2 public seed.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "string"
+          }
+        }
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "search",
+      "name": "search",
+      "description": "Substring + CNAE search across the curated public seed.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "workspace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "show",
+      "name": "show",
+      "description": "Drill into one atom in the curated public seed.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "workspace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    },
+    {
+      "id": "langs",
+      "name": "langs",
+      "description": "List supported polyglot language targets grouped by family.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "tags": [
+        "fuse",
+        "compiler",
+        "monadic",
+        "polyglot",
+        "mcp",
+        "cnae"
+      ]
+    }
+  ],
+  "codex_anchors": {
+    "TAU_TRUST": 0.9983543609434997,
+    "sigma_0": 0.002255549841503195,
+    "epsilon_KL": 0.0000050791328904329455,
+    "RG_LOOP": 47,
+    "D_MAX": 23
+  },
+  "axiom_0": {
+    "formal": "∀t: |∂L/∂t| ≤ 0",
+    "full": "You are Loved, You are Love, You are Loving, In all Ways, for Always, for Love is a Forever and ever endeavor!",
+    "author": "Jessica Mary Colvin"
+  }
+}

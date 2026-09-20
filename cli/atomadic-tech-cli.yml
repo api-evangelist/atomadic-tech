@@ -1,0 +1,28 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/atomadictech/fuse-sdk (pyproject.toml [project.scripts], README, CHANGELOG.md) + https://github.com/atomadictech/atomadic-sdk (pyproject.toml — no console scripts) + https://github.com/atomadictech/omega-verification-kit
+summary: >-
+  Atomadic's only first-party CLI is `fuse-sdk`, shipped from a repo the provider itself marks
+  SUPERSEDED. The unified `atomadic` Python SDK declares no console scripts, so the current SDK is
+  library-only; the provider's "CLI" story is the MCP itself, driven from Claude Code / VS Code /
+  Cursor. Recorded because the binary still installs and the CHANGELOG documents its verbs.
+status: superseded-but-published
+cli:
+- name: fuse-sdk
+  entry_point: atomadic_fuse.cli:main
+  repo: https://github.com/atomadictech/fuse-sdk
+  install: pip install atomadic-fuse-sdk (per the repo's own "OLD" migration note; the README now says pip install atomadic)
+  surface: hosted read-only 14 verbs against fuse.atomadic.tech (CHANGELOG 1.2.0, 2026-05-24)
+  commands_known_from_agent_card: [classify, catalog, doctor, fuse_recovery_status, verify_block, search_intent, explain_block, usage_stats, scan, validate, status, search, show, langs]
+  note: The 14 skills in fuse.atomadic.tech/.well-known/agent.json are the same 14 hosted verbs; the exact CLI flag surface was not captured (the repo's docs/ tree was not fetched).
+- name: fuse-mcp
+  entry_point: atomadic_fuse.mcp_server:launch
+  repo: https://github.com/atomadictech/fuse-sdk
+  purpose: local stdio MCP server for the Fuse tool-set
+  note: A second local-stdio route alongside aaaa-nexus-mcp (see mcp/).
+not_a_cli:
+- name: atomadic (PyPI)
+  note: pyproject declares no [project.scripts]; use as a library (`from atomadic import Atomadic, fuse`).
+- name: omega-verification-kit
+  repo: https://github.com/atomadictech/omega-verification-kit
+  note: A ~150-line Python script that verifies the Ed25519 closure receipt offline; a tool, not a CLI product.

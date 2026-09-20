@@ -1,0 +1,92 @@
+generated: '2026-09-19'
+method: derived
+format: json
+rfc9457: false
+source: Derived from the 4xx responses declared in openapi/atomadic-tech-openapi.yml (OpenAPI 3.1.0, 149 operations; captured
+  2026-09-19 from https://atomadic.tech/openapi.json), enriched with the live HTTP 402 body observed on POST https://atomadic.tech/v1/threat/score
+  and GET https://atomadic.tech/a2a on 2026-09-19.
+summary: 'The contract declares exactly three reusable error responses — 400 BadRequest (93 operations), 401 Unauthorized
+  (114) and 402 PaymentRequired (111) — all application/json with a flat {"error": string} envelope; no 403/404/409/422/429/5xx
+  is declared anywhere. The API is NOT RFC 9457: zero application/problem+json media types. The live 402 body is richer than,
+  and differently shaped from, the one the spec documents (see drift below).'
+envelope:
+  media_type: application/json
+  default_shape: '{ "error": string, ... }'
+  note: A single string discriminator. No code, no type URI, no request id in the body — the request id travels only in the
+    X-Request-Id response header (see conventions/).
+problems:
+- status: 400
+  title: Bad Request
+  component: '#/components/responses/BadRequest'
+  media_type: application/json
+  shape: '{ "error": string }'
+  meaning: Invalid request body or missing required fields.
+  remediation: Compare the body against the operation requestBody.required list in the OpenAPI; every required field is enumerated
+    inline per operation.
+  declared_on: 93
+- status: 401
+  title: Unauthorized
+  component: '#/components/responses/Unauthorized'
+  media_type: application/json
+  shape: '{ "error": "Unauthorized" }'
+  meaning: Missing or invalid API key.
+  remediation: Send X-API-Key (key from https://atomadic.tech/pay) or a valid x402 payment proof. Per the agent card, every
+    paid endpoint also allows 3 credential-free trial calls per day.
+  declared_on: 114
+- status: 402
+  title: Payment Required (x402)
+  component: '#/components/responses/PaymentRequired'
+  media_type: application/json
+  shape_declared: '{ "error": "Payment required", "amount": string, "currency": "USDC", "treasury": string, "chains": ["base","polygon","solana"]
+    }'
+  shape_observed: '{ "error": "payment_required", "amount_micro_usdc": int, "amount_usdc": string, "chain_id": 8453, "currency":
+    "USDC", "expires": unix, "expires_in_seconds": 300, "message": string, "nonce": hex, "recipient": 0x-address, "token_address":
+    0x-address, "x402_version": "2.1", "sdk_hints": {...} }'
+  meaning: The endpoint is metered; no API key and no payment proof accompanied the request (or the daily free-trial allowance
+    is exhausted).
+  remediation: Pay the quoted amount in USDC on Base (chain 8453) to `recipient`, then retry within `expires_in_seconds` (300
+    s) with the proof in the PAYMENT-SIGNATURE or X-402-Payment header — or send X-API-Key. The nonce is single-use and expires
+    in 5 minutes (legal page).
+  declared_on: 111
+  headers_observed:
+    payment-required: 60000;USDC;0xcbd9...8fd9;<nonce>;<expires>
+    x-price-micro-usdc: '60000'
+    x-request-id: req_<hex>
+  drift: The spec documents a `treasury` field and three chains (base, polygon, solana) and names the proof header X-Payment-Proof;
+    the live 402 returns `recipient`, quotes ONLY Base (chain 8453), names PAYMENT-SIGNATURE / X-402-Payment as the accepted
+    headers, and declares x402_version 2.1 with a legacy semicolon PAYMENT-REQUIRED header encoding. Trust the live body,
+    which the provider itself says to prefer ("Prefer this JSON body for new integrations").
+undeclared:
+- '403'
+- '404'
+- '409'
+- '422'
+- '429'
+- '500'
+- '503'
+undeclared_note: None of these statuses appear in the contract. The status page says trial calls carry a 2-second delay rather
+  than a 429, and no rate-limit envelope is documented; treat any of these codes as undocumented behaviour and quote X-Request-Id
+  to atomadic69@gmail.com.
+live_evidence:
+- url: https://atomadic.tech/v1/threat/score
+  method: POST
+  status: 402
+  fetched: '2026-09-19'
+- url: https://atomadic.tech/a2a
+  method: GET
+  status: 402
+  fetched: '2026-09-19'
+  body_keys:
+  - amount_micro_usdc
+  - amount_usdc
+  - chain_id
+  - currency
+  - error
+  - expires
+  - expires_in_seconds
+  - message
+  - nonce
+  - recipient
+  - sdk_hints
+  - token_address
+  - x402_version

@@ -1,0 +1,313 @@
+{
+  "schema": "atomadic.state_of_truth.v1",
+  "published_at_utc": "2026-06-21T17:37:25Z",
+  "surface": {
+    "tool_count_public": 86,
+    "tool_count_internal": 77,
+    "product_count": 12,
+    "products": [
+      {
+        "key": "fuse",
+        "name": "Fuse",
+        "tagline": "AI writes code \u00e2\u20ac\u201d we give it architecture.",
+        "status": "live",
+        "eyebrow": "BUILD",
+        "entitlement": "fuse",
+        "tier_floor": "free",
+        "tool_count": 13,
+        "tools": [
+          "assess_architecture_pure",
+          "assess_import_direction_pure",
+          "assess_naming_clarity_pure",
+          "compose_contract_sketch_pure",
+          "compute_complexity_metrics_pure",
+          "extract_call_graph_pure",
+          "orchestrate_s2s_temporal",
+          "parse_controlflow_blocks_via_grammar_pure",
+          "render_intent_nl_sketch_pure",
+          "render_polyglot_all_pure",
+          "render_polyglot_roundtrip_pure",
+          "route_public_intent_preview_pure",
+          "scan_code_stubs_pure"
+        ]
+      },
+      {
+        "key": "nexus",
+        "name": "Nexus",
+        "tagline": "The trust gate every action passes.",
+        "status": "live",
+        "eyebrow": "TRUST",
+        "entitlement": "nexus",
+        "tier_floor": "free",
+        "tool_count": 14,
+        "tools": [
+          "assess_nexus_trust_phase_stateful",
+          "assess_sybil_risk_pure",
+          "classify_action_severity_pure",
+          "compose_sovereign_zero_llm_nl_response_pure",
+          "compute_reputation_score_pure",
+          "compute_trust_score_pure",
+          "compute_verified_randomness_pure",
+          "define_nexus_constants_pure",
+          "enforce_nexus_gate_stateful",
+          "match_agent_capability_pure",
+          "record_nexus_attestation_stateful",
+          "record_nexus_escalation_stateful",
+          "scan_nexus_attestation_history_stateful",
+          "validate_delegation_chain_pure"
+        ]
+      },
+      {
+        "key": "healer",
+        "name": "Healer",
+        "tagline": "Diagnose, grade, and plan the repair.",
+        "status": "beta",
+        "eyebrow": "HEAL",
+        "entitlement": "healer",
+        "tier_floor": "dev",
+        "tool_count": 5,
+        "tools": [
+          "assess_artifact_health_pure",
+          "classify_failure_mode_pure",
+          "compose_rollback_plan_pure",
+          "compute_blast_radius_pure",
+          "compute_repair_plan_pure"
+        ]
+      },
+      {
+        "key": "security",
+        "name": "Security",
+        "tagline": "A bubble of protection around every agent.",
+        "status": "live",
+        "eyebrow": "SECURE",
+        "entitlement": "security",
+        "tier_floor": "free",
+        "tool_count": 9,
+        "tools": [
+          "assess_security_bubble_pure",
+          "classify_error_fold_pure",
+          "compute_hardening_posture_pure",
+          "compute_redacted_args_pure",
+          "compute_redacted_text_pure",
+          "compute_threat_model_pure",
+          "define_security_constants_pure",
+          "scan_dependency_risk_pure",
+          "validate_secret_hygiene_pure"
+        ]
+      },
+      {
+        "key": "proving",
+        "name": "Proving Ground",
+        "tagline": "Nothing ships unproven.",
+        "status": "live",
+        "eyebrow": "PROVE",
+        "entitlement": "proving",
+        "tier_floor": "dev",
+        "tool_count": 6,
+        "tools": [
+          "assess_proof_readiness_pure",
+          "assess_skeleton_clone_pure",
+          "assess_test_quality_pure",
+          "compute_proof_obligations_pure",
+          "score_documentation_coverage_pure",
+          "score_test_coverage_pure"
+        ]
+      },
+      {
+        "key": "release",
+        "name": "Release",
+        "tagline": "Template -> render -> deploy.",
+        "status": "live",
+        "eyebrow": "SHIP",
+        "entitlement": "release",
+        "tier_floor": "dev",
+        "tool_count": 9,
+        "tools": [
+          "compose_changelog_pure",
+          "compute_semver_bump_pure",
+          "record_release_template_stateful",
+          "render_from_template_pure",
+          "render_website_stateful",
+          "scan_release_templates_stateful",
+          "serve_cloudflare_pages_stateful",
+          "serve_cloudflare_worker_stateful",
+          "validate_release_readiness_pure"
+        ]
+      },
+      {
+        "key": "evolve",
+        "name": "Evolve",
+        "tagline": "Bounded self-improvement, never blind.",
+        "status": "live",
+        "eyebrow": "EVOLVE",
+        "entitlement": "evolve",
+        "tier_floor": "pro",
+        "tool_count": 5,
+        "tools": [
+          "assess_improvement_candidates_pure",
+          "assess_regression_risk_pure",
+          "compose_mutation_plan_pure",
+          "rank_evolution_candidates_pure",
+          "score_evolution_fitness_pure"
+        ]
+      },
+      {
+        "key": "research",
+        "name": "Research",
+        "tagline": "Hypothesis-first inquiry, panel-graded.",
+        "status": "live",
+        "eyebrow": "RESEARCH",
+        "entitlement": "research",
+        "tier_floor": "dev",
+        "tool_count": 5,
+        "tools": [
+          "compose_experiment_design_pure",
+          "compose_literature_query_pure",
+          "compose_problem_decomposition_pure",
+          "compose_research_panel_pure",
+          "rank_hypotheses_pure"
+        ]
+      },
+      {
+        "key": "mind_lab",
+        "name": "Mind-Lab",
+        "tagline": "Cognitive QA for AI proposals.",
+        "status": "live",
+        "eyebrow": "MIND",
+        "entitlement": "mind_lab",
+        "tier_floor": "pro",
+        "tool_count": 5,
+        "tools": [
+          "assess_falsifiability_pure",
+          "assess_proposal_verdict_pure",
+          "classify_cognitive_bias_pure",
+          "compose_adversarial_critique_pure",
+          "score_idea_readiness_pure"
+        ]
+      },
+      {
+        "key": "aegis",
+        "name": "Aegis",
+        "tagline": "Enterprise governance, agent-native.",
+        "status": "live",
+        "eyebrow": "GOVERN",
+        "entitlement": "aegis",
+        "tier_floor": "dev",
+        "tool_count": 5,
+        "tools": [
+          "assess_compliance_posture_pure",
+          "classify_data_sensitivity_pure",
+          "compose_governance_report_pure",
+          "compute_audit_trail_digest_pure",
+          "enforce_action_policy_pure"
+        ]
+      },
+      {
+        "key": "vanguard",
+        "name": "Vanguard",
+        "tagline": "Pre-trade risk, MEV, spend policy.",
+        "status": "live",
+        "eyebrow": "DEFI",
+        "entitlement": "vanguard",
+        "tier_floor": "dev",
+        "tool_count": 5,
+        "tools": [
+          "assess_mev_exposure_pure",
+          "assess_transaction_risk_pure",
+          "compose_settlement_terms_pure",
+          "compute_slippage_guard_pure",
+          "validate_spend_policy_pure"
+        ]
+      },
+      {
+        "key": "catalyst",
+        "name": "Catalyst",
+        "tagline": "Machine-economy primitives: x402, quota trees, paywalls.",
+        "status": "live",
+        "eyebrow": "SETTLE",
+        "entitlement": "catalyst",
+        "tier_floor": "dev",
+        "tool_count": 5,
+        "tools": [
+          "compose_paywall_policy_pure",
+          "compute_settlement_split_pure",
+          "compute_usage_meter_pure",
+          "compute_x402_quote_pure",
+          "validate_quota_tree_pure"
+        ]
+      }
+    ]
+  },
+  "pricing": {
+    "founding": {
+      "name": "Founding Operator Key",
+      "price_usd": 99,
+      "currency": "usd",
+      "interval": "lifetime",
+      "products_included": [
+        "*"
+      ],
+      "entitlement_plan": "enterprise_full",
+      "stripe_url": "https://buy.stripe.com/aFadRb0sH2uZ130cjH1ck00",
+      "available": true,
+      "note": "Numbered founding cohort. Lifetime access to all current and future public products."
+    },
+    "tier_ladder": [
+      "free",
+      "basic",
+      "dev",
+      "pro",
+      "teams",
+      "enterprise"
+    ]
+  },
+  "endpoints": {
+    "mcp": "https://mcp.atomadic.tech",
+    "sdk_pypi": "https://pypi.org/project/atomadic/",
+    "sdk_repo": "https://github.com/atomadictech/atomadic-sdk",
+    "docs": "https://atomadic.tech/docs.html",
+    "site": "https://atomadic.tech",
+    "spec_index": "https://mcp.atomadic.tech/.well-known/atomadic-spec-index.json",
+    "closure_attestation": "https://mcp.atomadic.tech/.well-known/atomadic-closure.json",
+    "issuer_pubkey": "https://mcp.atomadic.tech/.well-known/atomadic-issuer-pubkey.json",
+    "state_of_truth": "https://mcp.atomadic.tech/.well-known/atomadic-state.json",
+    "support_email": "support@atomadic.tech"
+  },
+  "engine": {
+    "engine_status": "ALIVE",
+    "public_tool_count": 86,
+    "internal_tool_count": 77,
+    "as_of_utc": "2026-06-21T17:37:25Z",
+    "source": "computed live: logic-base shard census (+ catalog tool census when provided)",
+    "active_blocks": 29905,
+    "load_clean_pct": 99.83,
+    "provenance_failures": 0,
+    "e4_vendor_to_generated_flips": 13,
+    "quarantined": 29,
+    "schemas_verified": "32/32",
+    "v2_serving_cutover": "live",
+    "conductor": {
+      "strokes": 7,
+      "cadence": "steady-state",
+      "cron": "30 min sovereign",
+      "governor_state": "blocked_until_closure_green",
+      "live_broken_atoms_gate": 17,
+      "mutation_allowed": false
+    },
+    "v2_migration": "formally_complete",
+    "total_logic_elements": 29926
+  },
+  "attestation": {
+    "closure_url": "https://mcp.atomadic.tech/.well-known/atomadic-closure.json",
+    "pubkey_url": "https://mcp.atomadic.tech/.well-known/atomadic-issuer-pubkey.json",
+    "verify_recipe": "curl <closure_url> | jq .  &&  curl <pubkey_url> | jq .key  # verify Ed25519 sig with any standard lib"
+  },
+  "display": {
+    "master_hash": "F329417FD07C",
+    "active_nodes_count": "29,905",
+    "total_logic_elements": "29,926",
+    "public_tool_count": "86",
+    "product_count": "12",
+    "as_of_utc": "2026-06-21T17:37:25Z"
+  }
+}

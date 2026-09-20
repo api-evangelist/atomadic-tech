@@ -1,0 +1,1 @@
+{"api_key_header":"X-API-Key","bearer_methods_supported":["header"],"documentation":"https://atomadic.tech/quickstart","mcp_plugin":"https://atomadic.tech/docs/mcp","resource":"https://atomadic.tech","scopes_supported":["api:read","api:write"],"x402_payment":{"chain_id":8453,"currency":"USDC","network":"base","supported":true,"token":"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"}}

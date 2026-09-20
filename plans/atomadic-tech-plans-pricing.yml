@@ -1,0 +1,102 @@
+generated: '2026-09-19'
+method: probed
+source: https://atomadic.tech/.well-known/pricing.json (machine-readable) + https://atomadic.tech/pricing + https://atomadic.tech/pay + https://atomadic.tech/compliance + https://atomadic.tech/aegis + https://www.atomadic.tech/.well-known/mcp.json (products[]) + well-known/atomadic-tech-mcp-state.json (pricing.founding)
+checked: '2026-09-19'
+summary: >-
+  Atomadic prices three different ways for three different doors. (1) The AAAA-Nexus REST/A2A API
+  is pay-per-call in micro-USDC via x402 — every path is priced in a machine-readable manifest — or
+  prepaid with no-expiry credit packs. (2) The entitlement-gated MCP (mcp.atomadic.tech) is sold as
+  monthly suites ($29–$99/mo) plus a $99 lifetime Founding Key. (3) Compliance and AEGIS are sold as
+  enterprise contracts ($5K one-time to $100K/yr; $5K–$10K/mo lanes). No free plan as such, but a
+  free tier of 16 operations and 3 daily trial calls on every paid endpoint.
+plan_count: 12
+prices_published: true
+currency: [USDC, USD]
+public_signup_pricing: true
+free_tier:
+  operations: ['GET /health', 'GET /openapi.json', 'GET /.well-known/agent.json', 'GET /v1/oracle/entropy', 'GET /v1/rng/quantum', 'GET /v1/rng/verify', 'GET /v1/trust/decay', 'GET /v1/identity/sybil-check', 'GET /v1/auth/zero-trust', 'GET /v1/metrics', 'POST /v1/agents/register', 'GET /v1/agents/topology', 'GET /v1/swarm/inbox', 'GET /v1/payments/fee', 'HEAD /mcp', 'POST /mcp']
+  trial: 3 calls per paid endpoint per day, no credential, +2 s delay (agent card trialPolicy)
+  source: pricing.json tiers.free
+plans:
+- name: Pay-per-call (x402)
+  door: AAAA-Nexus REST + A2A + atomadic.tech/mcp
+  price: per call, 8000–200000 micro-USDC (0.008–0.20 USDC)
+  currency: USDC
+  billing_period: per call, settled on Base L2 (chain 8453)
+  included_quota: n/a
+  overage: n/a
+  limits: nonce expires 300 s; 3 free trial calls/endpoint/day before payment is demanded
+  examples: {'/v1/oracle/entropy': 8000, '/v1/threat/score': 60000, '/v1/inference': 100000 (llms.txt says $0.100), '/v1/compress': 200000, '/a2a': 8000, '/v1/compliance/eu-ai-act': 60000}
+  note: 89 paths priced in the manifest; 60 of them are not in the published OpenAPI (overlay lists them).
+- name: Dev credit pack
+  door: API key (X-API-Key)
+  price: 8
+  currency: USDC
+  billing_period: one-time, no expiry ("No subscription. No expiry." — quickstart)
+  included_quota: 500 calls
+  overage: buy another pack
+- name: Pro credit pack
+  door: API key
+  price: 30
+  currency: USDC
+  billing_period: one-time, no expiry
+  included_quota: 2500 calls
+- name: Enterprise credit pack
+  door: API key
+  price: 98
+  currency: USDC
+  billing_period: one-time, no expiry
+  included_quota: 10000 calls
+- name: Compliance & Trust suite
+  door: mcp.atomadic.tech entitlement key (ato_)
+  price: 39
+  currency: USD
+  billing_period: month
+  included_quota: unmetered within the suite's tool-set
+  positioning: EU AI Act articles · GDPR/CCPA gates · trust scoring · verification
+- name: Agent & DeFi Ops suite
+  door: mcp.atomadic.tech
+  price: 39
+  currency: USD
+  billing_period: month
+- name: Intelligence suite
+  door: mcp.atomadic.tech
+  price: 39
+  currency: USD
+  billing_period: month
+- name: Fuse Pro
+  door: mcp.atomadic.tech + fuse.atomadic.tech/mcp
+  price: 29
+  currency: USD
+  billing_period: month
+- name: Fuse Team
+  door: mcp.atomadic.tech
+  price: 79
+  currency: USD
+  billing_period: month
+- name: Complete — All-Access
+  door: mcp.atomadic.tech
+  price: 99
+  currency: USD
+  billing_period: month
+  positioning: Every currently published product. One key.
+- name: Founding Operator Key
+  door: mcp.atomadic.tech
+  price: 99
+  currency: USD
+  billing_period: lifetime
+  source: well-known/atomadic-tech-mcp-state.json pricing.founding + homepage "Founding Key · $99" (Stripe checkout link)
+- name: Enterprise compliance (three tiers)
+  door: contract
+  tiers: [{name: Single-System Formal Assessment, price: 5000, currency: USD, billing_period: one-time}, {name: Single-Model Certification, price: 25000, currency: USD, billing_period: year}, {name: Full AI Act Conformity Suite, price: 100000, currency: USD, billing_period: year, limits: unlimited systems, 4h support SLA}]
+  source: https://atomadic.tech/compliance
+enterprise_suites:
+  AEGIS:
+    source: pricing.json enterprise_suites + https://atomadic.tech/aegis
+    per_call_micro_usdc: {mcp_proxy_execute: 8000, router_epistemic_bound: 8000, compliance_certify_epoch: 80000, failsafe_override_monitor: 60000}
+    monthly: {compliance_license_usd_mo: 5000, override_monitor_base_usd_mo: 10000, override_monitor_stream_usd_per_sec: 0.05}
+price_consistency_note: >-
+  Prices for the same endpoint differ across surfaces: /v1/inference is $0.100 in llms.txt, $0.060
+  on the status page and 100000 micro-USDC in the manifest; /v1/ratchet/register is $0.002 in the
+  spec description and 20000 micro-USDC ($0.020) in the manifest. The manifest and the live
+  X-Price-Micro-USDC header agree with each other; treat them as authoritative.

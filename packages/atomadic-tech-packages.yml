@@ -1,0 +1,79 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Registry metadata read live on 2026-09-19 — pypi.org/pypi/atomadic/json, pypi.org/pypi/aaaa-nexus-mcp/json,
+  registry.npmjs.org/aaaa-nexus-sdk — plus github.com/atomadictech (15 repos), the SDK README, the
+  mcp.atomadic.tech landing page ("Python SDK: pip install atomadic"), llms.txt and the legal page footer
+  ("npm SDK" link). Also checked: PyPI aaaa-nexus (404), npm atomadic (404), npm aaaa-nexus (404),
+  crates.io / RubyGems / NuGet / Maven / pkg.go.dev (no atomadic or aaaa-nexus packages).
+summary:
+  first_party_sdk_count: 3
+  languages: [python, typescript]
+  note: >-
+    Three first-party packages, all authored by Atomadic. The unified Python SDK `atomadic` is the
+    live one (18 releases, last 2026-06-21). The `aaaa-nexus-mcp` stdio MCP plugin and the
+    `aaaa-nexus-sdk` TypeScript SDK each have a single-digit release count and have not moved since
+    spring 2026; both point their Repository URL at GitHub repos that 404 today
+    (AAAA-Nexus/aaaa-nexus-mcp, atomadictech/aaaa-nexus). The quickstart, llms.txt and agent card
+    all still link github.com/atomadictech/aaaa-nexus, which is a 404 — a dead first-party link.
+github_organization:
+  found: true
+  url: https://github.com/atomadictech
+  type: User account (not an Organization), "Atomadic Tech", created 2026-03-15, 15 public repos
+  first_party_repos: [atomadic-sdk, fuse-sdk (superseded), omega-verification-kit, atomadic-core, ai-agent-marketplace]
+  note: Ten of the fifteen repos are forks of awesome-lists and third-party tools (requests, httpie, x402); only the five above are Atomadic's own.
+packages:
+- language: python
+  registry: pypi
+  name: atomadic
+  url: https://pypi.org/project/atomadic/
+  install: pip install atomadic
+  official: true
+  version: 0.3.6
+  published: '2026-06-21'
+  release_count: 18
+  license: Apache-2.0
+  repository: https://github.com/atomadictech/atomadic-sdk
+  author: Atomadic <support@atomadic.tech>
+  summary: Atomadic Python SDK -- one MCP, entitlement-gated tool-sets
+  targets: https://mcp.atomadic.tech (Bearer ato_ entitlement key; ATOMADIC_KEY env var)
+  wraps: MCP tool-sets (fuse, nexus, security, healer, ...) — NOT the AAAA Nexus REST API directly
+- language: python
+  registry: pypi
+  name: aaaa-nexus-mcp
+  url: https://pypi.org/project/aaaa-nexus-mcp/
+  install: pip install aaaa-nexus-mcp
+  run: python -m aaaa_nexus_mcp
+  official: true
+  version: 0.1.1
+  published: '2026-05-02'
+  release_count: 2
+  repository: https://github.com/AAAA-Nexus/aaaa-nexus-mcp
+  repository_status: 404 on 2026-09-19 (org AAAA-Nexus exists, 0 public repos)
+  author: Atomadic <dev@atomadic.tech>
+  summary: Claude Code MCP plugin for the AAAA-Nexus trust, security, and agent infrastructure API
+  declared_in: https://atomadic.tech/.well-known/mcp.json packages[]
+  note: The stdio MCP server for Claude Code / VS Code / Cursor; llms.txt advertises "113 tools".
+- language: typescript
+  registry: npm
+  name: aaaa-nexus-sdk
+  url: https://www.npmjs.com/package/aaaa-nexus-sdk
+  install: npm install aaaa-nexus-sdk
+  official: true
+  version: 1.0.0
+  published: '2026-04-16'
+  release_count: 1
+  repository: https://github.com/atomadictech/aaaa-nexus
+  repository_status: 404 on 2026-09-19
+  author: Atomadic Tech <atomadic@proton.me>
+  summary: Official TypeScript SDK for AAAA Nexus — formally verified AI safety infrastructure
+  linked_from: https://atomadic.tech/legal (footer "npm SDK")
+  currency_note: >-
+    Single release, 2026-04-16, five months before this capture; the REST API it wraps has since
+    moved from v0.4.0 (2026-03-20) to v0.5.x with new escrow/reputation/SLA/discovery endpoints per
+    the changelog, so this SDK predates a fifth of the surface.
+superseded:
+- name: atomadic-fuse-sdk (fuse-sdk repo)
+  repository: https://github.com/atomadictech/fuse-sdk
+  note: README says "This repo is SUPERSEDED — canonical SDK is atomadic-sdk". Kept for its `fuse-sdk` / `fuse-mcp` console scripts (cli/).
+third_party_packages: []

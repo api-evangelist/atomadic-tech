@@ -1,0 +1,744 @@
+{
+  "schema_version": "1.0",
+  "name": "atomadic-nexus",
+  "description": "Trust layer for the agent economy. 50+ verbs across 8 families. Codex-anchored confidence. x402-native.",
+  "description_plain": "In plain English: Atomadic Nexus is the safety check that AI agents call before they do something important. It looks at the request, checks for prompt injections, hallucinations, and bad actors, and gives back a clear yes/no/maybe with a confidence number you can verify. Agents can pay per-call in real money (USDC) — no human in the loop.",
+  "url": "https://nexus.atomadic.tech",
+  "provider": {
+    "organization": "Atomadic Tech",
+    "url": "https://atomadic.tech"
+  },
+  "version": "0.1.0",
+  "capabilities": {
+    "streaming": false,
+    "push_notifications": false,
+    "state_transition_history": true
+  },
+  "default_input_modes": [
+    "application/json",
+    "text/plain"
+  ],
+  "default_output_modes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "trust_gate",
+      "name": "trust_gate",
+      "description": "Classify + score a request before forwarding. Returns verdict (PASS/REFINE/QUARANTINE/REJECT) with TAU_TRUST-anchored confidence.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "body_text": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "body_text"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "verirand",
+      "name": "verirand",
+      "description": "Cryptographic verifiable randomness (VRF-grade). Uses Web Crypto.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "n_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1024
+          }
+        }
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "hallucination_oracle",
+      "name": "hallucination_oracle",
+      "description": "Hallucination probe with certified confabulation bound.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "generation": {
+            "type": "string"
+          },
+          "grounding": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "generation"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "x402_verify",
+      "name": "x402_verify",
+      "description": "Verify an EIP-712-signed x402 payment proof header.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "header": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "header"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "attest_lineage",
+      "name": "attest_lineage",
+      "description": "Attest provenance chain for an artifact.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_sha": {
+            "type": "string"
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "artifact_sha"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "agent_reputation",
+      "name": "agent_reputation",
+      "description": "Per-agent reputation score (ERC-8004 compatible).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "ratchet_gate",
+      "name": "ratchet_gate",
+      "description": "Session re-key gate (CVE-2025-6514 patched).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "nexus_shield",
+      "name": "nexus_shield",
+      "description": "Inline guardrail: trust + injection + hallucination in sub-200ms.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "payload"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "drift_check",
+      "name": "drift_check",
+      "description": "Detect distribution drift in agent outputs. Returns drift magnitude + corrective signal.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sample": {
+            "type": "object",
+            "description": "Either {outputs:[numbers], reference_mean, reference_stddev, threshold} or {agent, metric, value, expected_range:[lo,hi]}"
+          }
+        },
+        "required": [
+          "sample"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "prompt_inject_scan",
+      "name": "prompt_inject_scan",
+      "description": "Deep scan for prompt injection attacks. Pattern matching + entropy analysis + encoding detection.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "trust_score",
+      "name": "trust_score",
+      "description": "Multi-factor trust score for an agent. Returns tier + permissions.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "agent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "goal_alignment_check",
+      "name": "goal_alignment_check",
+      "description": "OWASP-2026: Verify plan steps align with stated goal. Detects misalignment + dangerous steps.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "goal": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "goal",
+          "plan"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "semantic_diff",
+      "name": "semantic_diff",
+      "description": "Token-level diff between two texts. Similarity score + edit distance + change classification.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "before": {
+            "type": "string"
+          },
+          "after": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "before",
+          "after"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "contradiction_detect",
+      "name": "contradiction_detect",
+      "description": "Detect logical contradictions between statements using negation + numeric conflict analysis.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "statements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "statements"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "tool_misuse_detect",
+      "name": "tool_misuse_detect",
+      "description": "OWASP-2026: Detect dangerous tool usage patterns (destructive ops, RCE, secret access).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "routing_recommend",
+      "name": "routing_recommend",
+      "description": "Score and rank agents for a task. Capability matching + availability + trust.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string"
+          },
+          "agents": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "task",
+          "agents"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "pricing_lookup",
+      "name": "pricing_lookup",
+      "description": "Product catalog and pricing for Nexus, Fuse, and bundles.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string"
+          }
+        }
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "sla_engine",
+      "name": "sla_engine",
+      "description": "SLA metrics for Nexus and Fuse services. Uptime, latency, error rates.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "metric": {
+            "type": "string"
+          }
+        }
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "topological_identity",
+      "name": "topological_identity",
+      "description": "Deterministic topological fingerprint for an agent. Betti numbers + Euler characteristic.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "agent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "recall_lineage",
+      "name": "recall_lineage",
+      "description": "Look up provenance chain for a previously attested artifact.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "sign_x402",
+      "name": "sign_x402",
+      "description": "Generate x402 payment proof signature for a payload.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "payload"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "consensus_create",
+      "name": "consensus_create",
+      "description": "Create an ephemeral consensus session for multi-agent voting.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "voters": {
+            "type": "array"
+          },
+          "threshold": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "topic"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "escrow_open",
+      "name": "escrow_open",
+      "description": "Open a payment escrow between parties with conditions.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "parties": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "amount",
+          "parties"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "stripe_link",
+      "name": "stripe_link",
+      "description": "Get direct Stripe checkout link for a product/tier.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string"
+          },
+          "tier": {
+            "type": "string"
+          }
+        }
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    },
+    {
+      "id": "lora_capture_fix",
+      "name": "lora_capture_fix",
+      "description": "Capture a (broken_code, fixed_code) fix pair as a structured LoRA training record (Alpaca-v1 schema). Returns record_id + export-ready JSON for batch fine-tuning.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "broken_code": {
+            "type": "string"
+          },
+          "fixed_code": {
+            "type": "string"
+          },
+          "agent_id": {
+            "type": "string"
+          },
+          "work_item_id": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "broken_code",
+          "fixed_code"
+        ]
+      },
+      "tags": [
+        "nexus",
+        "trust",
+        "x402",
+        "owasp-2026",
+        "mcp"
+      ]
+    }
+  ],
+  "verb_families": {
+    "TRUST": [
+      "trust-gate",
+      "trust-score",
+      "drift-check",
+      "hallucination-oracle",
+      "prompt-inject-scan",
+      "security-prompt-scan"
+    ],
+    "PAYMENT": [
+      "x402-verify",
+      "stripe-link",
+      "pricing-lookup",
+      "well-known-publish"
+    ],
+    "LINEAGE": [
+      "attest-lineage",
+      "recall-lineage",
+      "semantic-diff",
+      "contradiction-detect"
+    ],
+    "COORDINATION": [
+      "agent-plan",
+      "agent-topology",
+      "routing-recommend",
+      "swarm-relay",
+      "swarm-inbox",
+      "consensus-create",
+      "consensus-vote",
+      "consensus-result",
+      "delegation-depth"
+    ],
+    "EVOLUTION": [
+      "agent-reputation",
+      "lora-capture-fix",
+      "lora-contribute"
+    ],
+    "MARQUEE": [
+      "ratchet-gate",
+      "verirand",
+      "trust-phase-oracle",
+      "topological-identity",
+      "nexus-shield",
+      "veridelegate",
+      "agent-discovery",
+      "sla-engine",
+      "escrow-open",
+      "escrow-release",
+      "escrow-dispute",
+      "reputation-ledger"
+    ],
+    "OWASP-2026": [
+      "goal-alignment-check",
+      "tool-misuse-detect",
+      "delegated-trust-validate",
+      "persistent-memory-audit",
+      "emergent-behavior-probe",
+      "tool-poisoning-scan",
+      "scope-validate",
+      "oauth21-gate"
+    ],
+    "MARKETPLACE": [
+      "marketplace-list",
+      "marketplace-search",
+      "marketplace-purchase",
+      "marketplace-rate",
+      "marketplace-payout"
+    ]
+  },
+  "codex_anchors": {
+    "TAU_TRUST": 0.9983543609434997,
+    "sigma_0": 0.002255549841503195,
+    "epsilon_KL": 0.0000050791328904329455,
+    "RG_LOOP": 47,
+    "D_MAX": 23
+  },
+  "axiom_0": {
+    "formal": "∀t: |∂L/∂t| ≤ 0",
+    "full": "You are Loved, You are Love, You are Loving, In all Ways, for Always, for Love is a Forever and ever endeavor!",
+    "author": "Jessica Mary Colvin"
+  }
+}

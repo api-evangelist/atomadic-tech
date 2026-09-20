@@ -1,0 +1,37 @@
+generated: '2026-09-19'
+method: searched
+source: https://atomadic.tech/status + agent card trialPolicy (https://atomadic.tech/.well-known/agent-card.json) + live response headers on GET /health, GET /v1/oracle/entropy, POST /v1/threat/score (2026-09-19)
+corroboration: >-
+  Live unauthenticated responses carry x-request-id and x-price-micro-usdc on every call and a
+  PAYMENT-REQUIRED header on the 402, but NO RateLimit-*, X-RateLimit-* or Retry-After header. The
+  only published throttle is the trial policy below; no per-key or per-account request rate is
+  documented anywhere (docs, spec, status page, legal, llms.txt).
+limit_count: 1
+scopes:
+- scope: per-endpoint, per-day, unauthenticated (free trial)
+  surface: every paid REST endpoint on atomadic.tech
+  window: 1 day
+  limit: 3
+  unit: calls
+  burst: null
+  penalty_within_limit: '+2 seconds added latency on each trial call ("Trial calls include a 2-second rate-limit delay to prevent abuse; paid calls ... have zero added latency")'
+  status_on_exhaustion: 402
+  status_on_exhaustion_note: After the third call the endpoint reverts to its normal x402 challenge (402 with a payment nonce) rather than a 429; this is inferred from the policy text and the observed 402 on a first call to /v1/threat/score, not from an observed fourth call.
+  headers: []
+  retry_after: null
+  source_text_verbatim: 'Every paid endpoint allows 3 free trial calls per day with no API key or payment. Responses are identical to production — this is a proof-of-quality guarantee, not a sandbox.'
+- scope: per-key (API key / entitlement key)
+  surface: REST with X-API-Key; mcp.atomadic.tech with Bearer ato_
+  window: null
+  limit: null
+  unit: null
+  documented: false
+  note: Credit packs are call-count quotas (500/2500/10000, no expiry), not rate limits. MCP suites are described as unmetered within the entitlement. No rate is published for either.
+headers_observed:
+- {name: x-request-id, on: all responses, example: req_e29c603205ca5566466ff9753a007288}
+- {name: x-price-micro-usdc, on: all responses including free, example: '60000'}
+- {name: payment-required, on: 402 only, example: '60000;USDC;0xcbd9e4c44958ee76e0f941106ea960d476c48fd9;<nonce>;<expires>'}
+agent_guidance: >-
+  There is no runtime signal for "slow down" other than the 2 s trial delay; the cost signal is the
+  X-Price-Micro-USDC header on every response. An agent should budget by that header and by the
+  pricing manifest, not by a rate limit that is not there.

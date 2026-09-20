@@ -1,0 +1,445 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "tools": [
+      {
+        "name": "trust_gate",
+        "description": "Classify + score a request before forwarding. Returns verdict (PASS/REFINE/QUARANTINE/REJECT) with TAU_TRUST-anchored confidence.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body_text": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "body_text"
+          ]
+        }
+      },
+      {
+        "name": "verirand",
+        "description": "Cryptographic verifiable randomness (VRF-grade). Uses Web Crypto.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "n_bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1024
+            }
+          }
+        }
+      },
+      {
+        "name": "hallucination_oracle",
+        "description": "Hallucination probe with certified confabulation bound.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "generation": {
+              "type": "string"
+            },
+            "grounding": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "generation"
+          ]
+        }
+      },
+      {
+        "name": "x402_verify",
+        "description": "Verify an EIP-712-signed x402 payment proof header.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "header": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "header"
+          ]
+        }
+      },
+      {
+        "name": "attest_lineage",
+        "description": "Attest provenance chain for an artifact.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "artifact_sha": {
+              "type": "string"
+            },
+            "parents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "artifact_sha"
+          ]
+        }
+      },
+      {
+        "name": "agent_reputation",
+        "description": "Per-agent reputation score (ERC-8004 compatible).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "agent_id"
+          ]
+        }
+      },
+      {
+        "name": "ratchet_gate",
+        "description": "Session re-key gate (CVE-2025-6514 patched).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "session_id"
+          ]
+        }
+      },
+      {
+        "name": "nexus_shield",
+        "description": "Inline guardrail: trust + injection + hallucination in sub-200ms.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "payload"
+          ]
+        }
+      },
+      {
+        "name": "drift_check",
+        "description": "Detect distribution drift in agent outputs. Returns drift magnitude + corrective signal.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "sample": {
+              "type": "object",
+              "description": "Either {outputs:[numbers], reference_mean, reference_stddev, threshold} or {agent, metric, value, expected_range:[lo,hi]}"
+            }
+          },
+          "required": [
+            "sample"
+          ]
+        }
+      },
+      {
+        "name": "prompt_inject_scan",
+        "description": "Deep scan for prompt injection attacks. Pattern matching + entropy analysis + encoding detection.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "prompt"
+          ]
+        }
+      },
+      {
+        "name": "trust_score",
+        "description": "Multi-factor trust score for an agent. Returns tier + permissions.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "agent": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "agent"
+          ]
+        }
+      },
+      {
+        "name": "goal_alignment_check",
+        "description": "OWASP-2026: Verify plan steps align with stated goal. Detects misalignment + dangerous steps.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "goal": {
+              "type": "string"
+            },
+            "plan": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "goal",
+            "plan"
+          ]
+        }
+      },
+      {
+        "name": "semantic_diff",
+        "description": "Token-level diff between two texts. Similarity score + edit distance + change classification.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "before": {
+              "type": "string"
+            },
+            "after": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "before",
+            "after"
+          ]
+        }
+      },
+      {
+        "name": "contradiction_detect",
+        "description": "Detect logical contradictions between statements using negation + numeric conflict analysis.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "statements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "statements"
+          ]
+        }
+      },
+      {
+        "name": "tool_misuse_detect",
+        "description": "OWASP-2026: Detect dangerous tool usage patterns (destructive ops, RCE, secret access).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "tool"
+          ]
+        }
+      },
+      {
+        "name": "routing_recommend",
+        "description": "Score and rank agents for a task. Capability matching + availability + trust.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "task": {
+              "type": "string"
+            },
+            "agents": {
+              "type": "array"
+            }
+          },
+          "required": [
+            "task",
+            "agents"
+          ]
+        }
+      },
+      {
+        "name": "pricing_lookup",
+        "description": "Product catalog and pricing for Nexus, Fuse, and bundles.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "product": {
+              "type": "string"
+            },
+            "tier": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "sla_engine",
+        "description": "SLA metrics for Nexus and Fuse services. Uptime, latency, error rates.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "service": {
+              "type": "string"
+            },
+            "metric": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "topological_identity",
+        "description": "Deterministic topological fingerprint for an agent. Betti numbers + Euler characteristic.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "agent": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "agent"
+          ]
+        }
+      },
+      {
+        "name": "recall_lineage",
+        "description": "Look up provenance chain for a previously attested artifact.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "artifact": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact"
+          ]
+        }
+      },
+      {
+        "name": "sign_x402",
+        "description": "Generate x402 payment proof signature for a payload.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "payload"
+          ]
+        }
+      },
+      {
+        "name": "consensus_create",
+        "description": "Create an ephemeral consensus session for multi-agent voting.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string"
+            },
+            "voters": {
+              "type": "array"
+            },
+            "threshold": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "topic"
+          ]
+        }
+      },
+      {
+        "name": "escrow_open",
+        "description": "Open a payment escrow between parties with conditions.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "parties": {
+              "type": "array"
+            }
+          },
+          "required": [
+            "amount",
+            "parties"
+          ]
+        }
+      },
+      {
+        "name": "stripe_link",
+        "description": "Get direct Stripe checkout link for a product/tier.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "product": {
+              "type": "string"
+            },
+            "tier": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "lora_capture_fix",
+        "description": "Capture a (broken_code, fixed_code) fix pair as a structured LoRA training record (Alpaca-v1 schema). Returns record_id + export-ready JSON for batch fine-tuning.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "broken_code": {
+              "type": "string"
+            },
+            "fixed_code": {
+              "type": "string"
+            },
+            "agent_id": {
+              "type": "string"
+            },
+            "work_item_id": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "task": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "broken_code",
+            "fixed_code"
+          ]
+        }
+      }
+    ]
+  }
+}

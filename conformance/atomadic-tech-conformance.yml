@@ -1,0 +1,76 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/atomadic-tech-openapi.yml + live /.well-known/ probes + live MCP initialize + live 402
+  bodies + https://atomadic.tech/trust.html + https://atomadic.tech/compliance + https://atomadic.tech/legal
+standards:
+- id: openapi-3.1
+  conforms: true
+  evidence: https://atomadic.tech/openapi.json declares openapi 3.1.0, 149 operations, every operation carries an operationId; parses cleanly.
+- id: a2a
+  conforms: true
+  evidence: /.well-known/agent-card.json (and legacy /.well-known/agent.json) serves an A2A card graded conformant against 1.0.0 — a2a/atomadic-tech-a2a.yml. The /a2a endpoint is live but x402-metered (402).
+- id: mcp
+  conforms: true
+  evidence: initialize on https://mcp.atomadic.tech negotiates protocolVersion 2024-11-05 (serverInfo atomadic-mcp 0.6.9); tools/list answers with inputSchema on three hosts — mcp/atomadic-tech-mcp.yml.
+- id: x402
+  conforms: true
+  evidence: Live 402 on POST /v1/threat/score and GET /a2a carries x402_version "2.1", chain_id 8453, USDC token 0x8335...2913, nonce, expires_in_seconds 300, and a PAYMENT-REQUIRED response header; /.well-known/pricing.json publishes payment_headers [PAYMENT-SIGNATURE, X-402-Payment]. The provider itself notes it still emits the legacy semicolon PAYMENT-REQUIRED encoding rather than v2 base64 JSON.
+- id: rfc9116-security-txt
+  conforms: true
+  evidence: https://atomadic.tech/.well-known/security.txt 200 with Contact, Expires (2027-01-01), Preferred-Languages, Canonical. No Policy or Encryption line.
+- id: rfc9728-protected-resource-metadata
+  conforms: false
+  partial: true
+  evidence: /.well-known/oauth-protected-resource returns 200 JSON with resource, scopes_supported [api:read, api:write] and bearer_methods_supported [header] but omits the REQUIRED authorization_servers member and mixes in non-RFC keys (api_key_header, x402_payment, mcp_plugin). No authorization server exists to point at. Not served on the MCP host (405).
+- id: rfc8414-authorization-server-metadata
+  conforms: false
+  evidence: /.well-known/oauth-authorization-server is 404 on atomadic.tech and www, 405 on mcp.atomadic.tech.
+- id: oauth2
+  conforms: false
+  evidence: No oauth2 securityScheme in the OpenAPI (three apiKey schemes only); MCP auth is a bearer entitlement token minted by the provider, not an OAuth flow.
+- id: oidc-discovery
+  conforms: false
+  evidence: /.well-known/openid-configuration 404 (apex, www) / 405 (mcp).
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: 'Every declared error is application/json with a flat {"error": string} envelope; zero application/problem+json media types — errors/atomadic-tech-problem-types.yml.'
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No Deprecation/Sunset headers documented; no operation marked deprecated; no deprecation policy page — lifecycle/atomadic-tech-lifecycle.yml.
+- id: idempotency-key
+  conforms: false
+  evidence: Zero matches for "idempot" in the 149-operation spec; no Idempotency-Key header documented anywhere — conventions/atomadic-tech-conventions.yml.
+- id: pagination
+  conforms: false
+  evidence: No page/cursor/offset parameters anywhere in the contract (grep 0/0/0); list operations (searchAgents, getThreatHistory, getAuditTrail, ratchetList) return unbounded arrays with a `total`.
+- id: openai-plugin-manifest
+  conforms: true
+  evidence: /.well-known/ai-plugin.json 200, schema_version v1, api.type openapi -> https://atomadic.tech/openapi.json, auth none.
+- id: eu-ai-act
+  conforms: null
+  claim_only: true
+  evidence: >-
+    The provider SELLS EU AI Act / NIST AI RMF / ISO 42001 conformity checks as a product and its
+    trust page self-scores "100% compliant_posture" on all three via its own engine; it also states
+    plainly that "the third-party SOC 2 / ISO 27001 audit is the procurement closer; the scaffold is
+    already passing" — i.e. NO third-party certification exists yet. Recorded as a claim, not a
+    conformance, and NO Compliance pointer is emitted.
+- id: soc2
+  conforms: false
+  evidence: 'trust.html: third-party SOC 2 audit not yet performed (own words). probe-security-programs.py found no trust center with named certifications.'
+- id: iso-27001
+  conforms: false
+  evidence: 'trust.html: same sentence as SOC 2 — planned, not held.'
+- id: fips-203-ml-kem
+  conforms: null
+  claim_only: true
+  evidence: 'trust.html claims "NIST ML-KEM (FIPS-203) for session keys" in the critical hardening tier; the OpenAPI exposes POST /v1/shield/post-quantum (shieldPostQuantum) but no algorithm identifiers appear in the contract. Claim recorded, not verified.'
+domain_standards:
+  note: >-
+    Looked for a contract-declared domain standard signature (SCIM URNs, OData $metadata, OpenRTB,
+    Sparkplug, ActivityPub, LTI/OneRoster, OAI-PMH, HL7/X12/ISO-20022, W3C DID/VC for the identity
+    surface). None appears in the 149-operation spec — the identity, UCAN and delegation operations
+    use provider-specific bodies. x402 and A2A are recorded above as protocol conformances; neither
+    is a sector data standard. Reward-only field left empty rather than invented.
+  declared: []

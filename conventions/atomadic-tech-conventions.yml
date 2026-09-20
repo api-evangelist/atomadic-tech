@@ -1,0 +1,143 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/atomadic-tech-openapi.yml (149 operations) + live response headers on GET /health,
+  GET /v1/oracle/entropy, POST /v1/threat/score (402) and GET /a2a (402) + https://atomadic.tech/quickstart
+  + https://atomadic.tech/status + https://atomadic.tech/legal + agent card trialPolicy + /.well-known/pricing.json
+summary: >-
+  A pay-per-call, JSON-over-HTTPS API with three apiKey-style credentials, no OAuth, no idempotency
+  mechanism, no pagination, no documented rate-limit headers, and a flat {"error"} envelope. The
+  cross-cutting semantics that DO exist are the x402 payment challenge and a request-id header that
+  is CORS-exposed but undocumented. The write surface is large (98 POST operations) and mostly
+  irreversible.
+authentication:
+  styles: [api_key_header, x402_payment_proof_header, admin_token_header]
+  api_key_header: X-API-Key
+  api_key_prefix: an_ (quickstart examples "an_YOUR_KEY")
+  mcp_entitlement: 'Authorization: Bearer ato_<b64url(payload)>.<b64url(sig)> on mcp.atomadic.tech (Ed25519-signed; issuer key published)'
+  x402_headers_accepted: [PAYMENT-SIGNATURE, X-402-Payment]
+  x402_header_in_spec: X-Payment-Proof (declared but superseded by the live 402 sdk_hints)
+  free_trial: 3 calls per paid endpoint per day with no credential, +2 s delay (agent card trialPolicy, status page)
+  see: authentication/atomadic-tech-authentication.yml
+versioning:
+  style: path-prefix
+  prefix: /v1
+  see: lifecycle/atomadic-tech-lifecycle.yml
+idempotency:
+  coverage: none
+  documented: false
+  header: null
+  scope: []
+  notes: >-
+    Zero matches for "idempot" across the contract, the quickstart, the status page and the legal
+    terms. The write surface includes money-moving creates (createEscrow, createStripeSession,
+    registerSla with a USDC bond), state-advancing calls (ratchetAdvanceSession) and append-only
+    logs (logAuditEvent, recordReputation) with no replay key. No Idempotency pointer is emitted.
+  agent_risk: >-
+    A retried createEscrow after a timeout can lock funds twice; a retried ratchetAdvanceSession
+    moves the epoch twice; and every retry of a metered call under x402 is a second payment
+    (payments are non-refundable per /legal). Agents must confirm state (getEscrowStatus,
+    ratchetStatus, getCreditHistory) before retrying any POST.
+pagination:
+  style: none
+  params: []
+  response_fields: [total]
+  notes: >-
+    No page/cursor/offset/limit-as-pagination parameter anywhere in the contract. Collection reads
+    (searchAgents, discoverAgents, getThreatHistory, getAuditTrail, ratchetList, listDelegations,
+    getCreditHistory) return the whole array plus a `total` integer. The five "limit" matches are
+    business limits (spend, token budget), not page sizes.
+field_selection:
+  supported: false
+metadata:
+  supported: false
+  notes: escrow createEscrow accepts a free-form `conditions` object; no generic metadata field pattern.
+request_tracing:
+  supported: true
+  method: probed
+  headers:
+  - name: X-Request-Id
+    format: req_<32 hex>
+    note: Returned on every response observed (200 and 402). CORS-exposed. Undocumented; quote it to support.
+  - name: X-Price-Micro-USDC
+    note: Returned on every response including free ones (e.g. 20000 on GET /health, 8000 on /v1/oracle/entropy) — the metered price of the path regardless of whether it was charged.
+  - name: X-Atomadic-Tier
+  - name: X-Atomadic-Model
+  cors_exposed: 'access-control-expose-headers: X-Atomadic-Tier, X-Atomadic-Model, X-Request-Id, X-Price-Micro-USDC'
+  documented: false
+error_envelope:
+  media_type: application/json
+  shape: '{ "error": string }'
+  declared_statuses: [400, 401, 402]
+  rfc9457: false
+  see: errors/atomadic-tech-problem-types.yml
+payment_challenge:
+  status: 402
+  response_header: 'PAYMENT-REQUIRED: <amount_micro>;<currency>;<recipient>;<nonce_hex>;<expires_unix>'
+  body_fields: [amount_micro_usdc, amount_usdc, chain_id, currency, expires, expires_in_seconds, nonce, recipient, token_address, x402_version, sdk_hints]
+  nonce_ttl: 300 seconds (body) / "Nonces expire in 5 minutes" (/legal)
+  retry_headers: [PAYMENT-SIGNATURE, X-402-Payment]
+  retry_header_format: '<base64_sig>;<base64_pk>;<txid>;<amount_micro>[;<drift>][;<nonce>]'
+  network: Base L2 (chain 8453), USDC 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+  price_manifest: https://atomadic.tech/.well-known/pricing.json
+rate_limit_signaling:
+  headers: []
+  observed: No RateLimit-*, X-RateLimit-* or Retry-After header on any live response (2026-09-19).
+  documented_mechanism: 3 free trial calls per paid endpoint per day, each delayed 2 s; beyond that a 402 (not a 429) is the gate for paid endpoints.
+  status_on_exhaustion: 402 for paid endpoints; undocumented for free endpoints
+  see: rate-limits/atomadic-tech-rate-limits.yml
+dry_run_mode:
+  supported: false
+  notes: >-
+    No dry-run / validate-only flag on any operation. The nearest thing is the free-trial policy
+    (real production responses, 3/day) — the provider explicitly says "this is a proof-of-quality
+    guarantee, not a sandbox".
+reversibility:
+  read_only: false
+  write_operations: 98
+  grade: documented
+  grade_basis: >-
+    Several write surfaces have a named reversal operation in the contract, but NO reversal carries a
+    stated time window on any page — so the dimension is `documented` (0.4), not `verified`. Payments
+    are explicitly non-refundable (/legal §2), and every metered call is itself a payment.
+  surfaces:
+  - write: createEscrow
+    reversal: releaseEscrow (completes) / disputeEscrow (contests) / escrow arbitrate (status page, not in spec)
+    window: not stated — quickstart passes a `ttl_hours` on create and the status page says a dispute "triggers arbitration window" and "auto-resolves after 3 votes"; no duration is published
+    docs: https://atomadic.tech/status
+  - write: ratchetRegisterSession / ratchetAdvanceSession
+    reversal: ratchetRevoke
+    window: not stated
+  - write: registerIdentity
+    reversal: revokeIdentity
+    window: not stated
+  - write: createUcan / delegateUcan
+    reversal: revokeUcan
+    window: not stated
+  - write: validateDelegation (chain)
+    reversal: revokeDelegation
+    window: not stated
+  - write: generateKeys / rotateKeys
+    reversal: revokeKeys
+    window: not stated
+  - write: registerAgent / updateAgent
+    reversal: deregisterAgent
+    window: not stated
+  - write: swarmJoin
+    reversal: swarmLeave
+    window: not stated
+  - write: blockThreat
+    reversal: none in contract
+  - write: logAuditEvent, recordReputation, logOversight, reportIncident, reportSlaViolation
+    reversal: none — append-only by design (audit vault "tamper-proof hash chain")
+  - write: chatInference, compressData, text*, defi*, compliance* (compute calls)
+    reversal: n/a — no state created, but the x402 payment is final
+  - write: x402 payment / createStripeSession
+    reversal: none — "Payments are non-refundable once the on-chain transfer is confirmed" (https://atomadic.tech/legal §2)
+    window: none
+cross_links:
+  errors: errors/atomadic-tech-problem-types.yml
+  lifecycle: lifecycle/atomadic-tech-lifecycle.yml
+  authentication: authentication/atomadic-tech-authentication.yml
+  rate_limits: rate-limits/atomadic-tech-rate-limits.yml
+  plans: plans/atomadic-tech-plans-pricing.yml

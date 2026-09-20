@@ -1,0 +1,47 @@
+generated: '2026-09-19'
+method: generated
+source: 'Packaged Agent Skills generated from openapi/atomadic-tech-openapi.yml (captured 2026-09-19 from https://atomadic.tech/openapi.json),
+  the provider''s /.well-known/pricing.json, the live 402 challenge and the agent card trialPolicy. Every operationId is verified
+  verbatim against the spec by the generator (assertion below). Searched first for provider-published skills: /skills, /AGENTS.md,
+  /.well-known/agent-skills/ and /skills/_index.yml all 404 on 2026-09-19.'
+skills:
+- file: atomadic-tech-pay-per-call-with-x402.md
+  name: Pay for a call with x402
+  api: openapi/atomadic-tech-openapi.yml
+  operations:
+  - getHealth
+  - getPricingManifest
+  - getQuantumRng
+  - chatInference
+- file: atomadic-tech-run-an-agent-escrow.md
+  name: Run an agent-to-agent escrow
+  api: openapi/atomadic-tech-openapi.yml
+  operations:
+  - registerAgent
+  - createEscrow
+  - getEscrowStatus
+  - releaseEscrow
+  - disputeEscrow
+  - recordReputation
+  - getReputationScore
+- file: atomadic-tech-secure-a-session-with-ratchetgate.md
+  name: Secure a session with RatchetGate
+  api: openapi/atomadic-tech-openapi.yml
+  operations:
+  - ratchetRegisterSession
+  - ratchetAdvanceSession
+  - ratchetProbe
+  - ratchetStatus
+  - ratchetVerify
+  - ratchetList
+  - ratchetRevoke
+- file: atomadic-tech-check-eu-ai-act-compliance.md
+  name: Check EU AI Act compliance and certify drift
+  api: openapi/atomadic-tech-openapi.yml
+  operations:
+  - checkCompliance
+  - euAiActCertificate
+  - driftCheck
+  - getDriftCertificate
+  - logAuditEvent
+  - getAuditTrail

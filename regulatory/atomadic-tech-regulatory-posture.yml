@@ -1,0 +1,50 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://atomadic.tech/legal + https://atomadic.tech/trust.html + https://atomadic.tech/compliance + well-known/atomadic-tech-security.txt + live path probes
+signals: {}
+searched:
+  already_harvested:
+  - artifact: well-known/atomadic-tech-security.txt
+    finding: Contact + Expires only; no Policy line, no SBOM, no disclosure-program URL.
+  - artifact: security/atomadic-tech-vulnerability-disclosure.yml
+    finding: contact mailto only.
+  - artifact: lifecycle/atomadic-tech-lifecycle.yml
+    finding: no support-period or versioning-policy statement.
+  - artifact: conformance/atomadic-tech-conformance.yml
+    finding: EU AI Act / NIST / ISO 42001 appear as a PRODUCT the company sells and as a self-scored posture, not as a disclosure about the company's own AI use.
+  probed_paths:
+  - {url: https://atomadic.tech/accessibility, status: 404}
+  - {url: https://atomadic.tech/accessibility/vpat, status: 404}
+  - {url: https://atomadic.tech/legal/subprocessors, status: 404}
+  - {url: https://atomadic.tech/legal/dpa, status: 404}
+  - {url: https://atomadic.tech/privacy, status: 404}
+  - {url: https://atomadic.tech/privacy/requests, status: 404}
+  - {url: https://atomadic.tech/transparency, status: 404}
+  - {url: https://atomadic.tech/security, status: 404}
+  - {url: https://atomadic.tech/security/sbom, status: 404}
+  - {url: https://atomadic.tech/docs/data-residency, status: 404}
+  - {url: https://atomadic.tech/ai, status: 404}
+  - {url: https://atomadic.tech/ai/transparency, status: 404}
+  - {url: https://atomadic.tech/legal/report-content, status: 404}
+  - {url: https://atomadic.tech/terms, status: 404}
+  - {url: https://atomadic.tech/legal, status: 200, note: eight numbered clauses; see below}
+  - {url: https://atomadic.tech/trust.html, status: 200, note: self-scored compliance posture; no subprocessor table, no VPAT, no DPA, no SBOM}
+  docs_site:
+    checked: [https://atomadic.tech/docs.html, https://atomadic.tech/quickstart, https://atomadic.tech/llms.txt]
+    finding: no data-residency, export/portability or age-signal documentation.
+near_misses:
+- candidate: data_subject_request / privacy notice
+  where: https://atomadic.tech/legal §4
+  text_verbatim: 'GDPR/PIPEDA: No personal data is stored. Nonces expire in 5 minutes.'
+  why_not_recorded: A one-line no-storage assertion is not a request process — there is no channel, no rights enumeration, no response period. Recording it as a DSR signal would credit substance that is not there.
+- candidate: ai_transparency
+  where: 'homepage banner ("EU AI ACT: ARTICLE 50 TRANSPARENCY DUTIES BIND SUNDAY, AUG 2, 2026 — Try Free Risk Screening")'
+  why_not_recorded: A sales message about customers' Article 50 duties, not a disclosure of how Atomadic's own AI (Llama 3.1 inference at /v1/inference, "~90% AI-authored" claims elsewhere) is used or labelled.
+- candidate: incident_notification
+  where: /v1/compliance/incident + /v1/compliance/incidents operations
+  why_not_recorded: An API for customers to log THEIR incidents; not a commitment by Atomadic to notify customers of its own incidents within a stated period.
+note: >-
+  An empty signals map is the measurement: Atomadic publishes a legal page, a security.txt and a
+  self-scored trust page, and none of the fourteen observable horizontal-regulatory artifacts. No
+  regulatory pointers are emitted.

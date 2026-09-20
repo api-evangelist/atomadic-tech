@@ -1,0 +1,105 @@
+generated: '2026-09-19'
+method: probed
+status: published
+source: >-
+  Live JSON-RPC probes on 2026-09-19 — initialize + tools/list on https://mcp.atomadic.tech (200, 68
+  tools), tools/list on https://atomadic.tech/mcp (200, 44 tools), https://nexus.atomadic.tech/mcp
+  (200, 25 tools) and https://fuse.atomadic.tech/mcp (401) — plus the provider's /.well-known/mcp.json
+  on the apex and on www, the mcp.atomadic.tech landing page, the PyPI metadata for aaaa-nexus-mcp and
+  atomadic, and the GitHub repo atomadictech/atomadic-sdk. Raw responses saved alongside this file.
+summary: >-
+  Atomadic ships FOUR hosted MCP surfaces and one stdio package, all under its own domain. The
+  primary is mcp.atomadic.tech ("atomadic-mcp" 0.6.9, entitlement-gated by a Bearer ato_ key,
+  tools/list open without a key); the REST product's own server sits at atomadic.tech/mcp
+  ("aaaa-nexus", API-key or x402 per tool, free tools open); two product hosts (nexus., fuse.) run
+  their own servers. tools/list is anonymous on three of the four, so the full inputSchema of 137
+  tools was captured — no fallback to llms.txt was needed.
+deployment:
+  mode: both
+  endpoint: https://mcp.atomadic.tech
+  additional_endpoints:
+  - url: https://atomadic.tech/mcp
+    server: aaaa-nexus
+    tools: 44
+    auth: api-key (X-API-Key) or x402 per tool; free tools need nothing
+    declared_in: https://atomadic.tech/.well-known/mcp.json (serverUrl)
+  - url: https://nexus.atomadic.tech/mcp
+    server: atomadic-nexus 0.1.0
+    tools: 25
+    auth: unknown (tools/list anonymous; tools/call not exercised)
+  - url: https://fuse.atomadic.tech/mcp
+    server: atomadic-fuse 1.2.0
+    tools: null
+    auth: api-key (Fuse Pro entitlement) — tools/list itself answers 401 -32001
+  install: python -m aaaa_nexus_mcp
+  package: https://pypi.org/project/aaaa-nexus-mcp/
+  package_note: >-
+    Declared verbatim in the apex /.well-known/mcp.json packages[] (registryType pypi, identifier
+    aaaa-nexus-mcp, command python, args [-m, aaaa_nexus_mcp], transport stdio). PyPI: 0.1.1
+    published 2026-05-02; its Repository URL https://github.com/AAAA-Nexus/aaaa-nexus-mcp is a 404
+    (the AAAA-Nexus GitHub org exists with 0 public repos). llms.txt calls it "113 tools, pip install
+    aaaa-nexus-mcp". A second stdio route exists in the superseded fuse-sdk (`fuse-mcp` console
+    script, PyPI atomadic-fuse-sdk lineage) — see cli/.
+  auth: api-key
+  auth_detail: >-
+    mcp.atomadic.tech: Authorization: Bearer ato_<key> (Ed25519-signed entitlement token; issuer key
+    published at /.well-known/atomadic-issuer-pubkey.json). tools/list is open; without a key it
+    returns the public catalog and with a key it filters to the plan. tools/call is gated except
+    `murmuration` and the two render_polyglot_* demo atoms. Keys are sold per suite at
+    https://atomadic.tech/pricing ($29–$99/mo) or as a $99 lifetime Founding Key. atomadic.tech/mcp:
+    X-API-Key (an_ prefix per quickstart) or x402 USDC proof, per tool.
+  verified: probed
+  transport: streamable-http (JSON-RPC over POST; no SSE URL advertised)
+  protocol_version_negotiated: '2024-11-05'
+  server_info: {name: atomadic-mcp, version: 0.6.9}
+  built: '2026-08-02T15:13:10Z'
+servers:
+- name: atomadic-mcp
+  url: https://mcp.atomadic.tech
+  landing: https://mcp.atomadic.tech (HTML page with curl probes for initialize / tools/list / tools/call)
+  discovery: https://www.atomadic.tech/.well-known/mcp.json (well-known/atomadic-tech-www-mcp.json)
+  evidence:
+  - mcp/atomadic-tech-mcp-initialize.json
+  - mcp/atomadic-tech-mcp-tools-list.json
+  tool_count: 68
+  tool_count_note: >-
+    /api-status says 129 tools in catalog, 120 proxy tools, 8 bundled executable, 84 "withheld
+    non-executable"; the pricing page says "anything whose backend isn't deployed is withheld rather
+    than sold". tools/list served 68 on 2026-09-19.
+  instructions: >-
+    Call tools/call {name: murmuration} first (free, no key) — it returns the control-surface setup.
+    Then set Authorization: Bearer ato_<key>; tools/list returns only the tools the plan unlocks.
+  tool_families: [agents, compliance, defi, drift, escrow, forge, identity, inference, oracle, rag, ratchet, reputation, rng, security, sla, swarm, text, threat, trust, audit, polyglot]
+- name: aaaa-nexus
+  url: https://atomadic.tech/mcp
+  discovery: https://atomadic.tech/.well-known/mcp.json (well-known/atomadic-tech-mcp.json)
+  evidence: [mcp/atomadic-tech-nexus-mcp-tools-list.json]
+  tool_count: 44
+  input_schema_note: >-
+    Every POST tool declares a single `body` object "per the matching path in /openapi.json" — the
+    real parameter schema is the OpenAPI requestBody, which is why mcp/atomadic-tech-tool-crosswalk.yml
+    binds each tool to its operationId.
+  security_claim: {cve_2025_6514: mitigated, mitigation: RatchetGate 47-epoch session ratchet, ratchet_endpoint: /v1/ratchet/register}
+- name: atomadic-nexus
+  url: https://nexus.atomadic.tech/mcp
+  evidence: [mcp/atomadic-tech-nexus-host-mcp-tools-list.json]
+  tool_count: 25
+  note: The 25 tools mirror the 25 skills in the host's legacy agent.json.
+- name: atomadic-fuse
+  url: https://fuse.atomadic.tech/mcp
+  tool_count: null
+  gated: true
+  evidence_inline: 'HTTP 401 {"jsonrpc":"2.0","id":2,"error":{"code":-32001,"message":"Unauthorized: API key required. Get yours at https://atomadic.tech/pay?sku=fuse-pro"}}'
+tools_sample:
+- {name: murmuration, server: atomadic-mcp, free: true, description: START HERE — initialise the control surface; returns SDK install, unlocked tools, runnable demo.}
+- {name: compliance_eu_ai_act, server: atomadic-mcp, description: EU AI Act certificate; REST twin euAiActCertificate.}
+- {name: escrow_create, server: atomadic-mcp, description: Create agent-to-agent escrow; REST twin createEscrow.}
+- {name: ratchet_register, server: atomadic-mcp, description: Register a 47-epoch RatchetGate session; REST twin ratchetRegisterSession.}
+- {name: rng_quantum, server: aaaa-nexus, free: true, description: Quantum-seeded random bytes with HMAC-SHA256 entropy proof; REST twin getQuantumRng.}
+- {name: threat_score, server: aaaa-nexus, price_micro_usdc: 60000, description: Score a JSON payload for security threats; REST twin scoreThreat.}
+- {name: aegis_mcp_proxy_execute, server: aaaa-nexus, price_micro_usdc: 8000, description: NEXUS AEGIS MCP-Sentinel gateway; declared endpoint /v1/aegis/mcp-proxy/execute is NOT in the OpenAPI.}
+crosswalk: mcp/atomadic-tech-tool-crosswalk.yml
+listings:
+  searched: [Claude connector directory, ChatGPT apps, mcp.so, Smithery, PulseMCP, glama]
+  found: []
+  note: Not searched exhaustively; llms.txt and the docs advertise install into Claude Code / VS Code / Cursor via the PyPI package rather than a directory listing.

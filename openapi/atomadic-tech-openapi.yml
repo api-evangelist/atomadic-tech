@@ -1,0 +1,6489 @@
+openapi: 3.1.0
+info:
+  title: AAAA Nexus API
+  version: 0.5.1
+  description: Formally verified AI safety APIs for autonomous agents. Supports REST, MCP, A2A (Google protocol), and x402 micropayment protocol.
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+  responses:
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  schemas:
+    HelixStatus:
+      type: object
+      description: HELIX integrity subsystem status
+      properties:
+        anti_hallucination:
+          type: boolean
+        ecc_status:
+          type: boolean
+        integrity_parity:
+          type: boolean
+    ChatMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          description: Message role
+        content:
+          type: string
+          description: Message content
+tags:
+- name: Free
+  description: Endpoints that require no authentication or payment
+- name: Oracle
+  description: Entropy oracle and hallucination detection
+- name: Security
+  description: RatchetGate session security, identity verification, threat scoring, and compliance
+- name: Agents
+  description: Agent registration, topology, planning, intent classification, and reputation
+- name: Inference
+  description: LLM inference with built-in hallucination guard
+- name: Text
+  description: 'Text processing utilities: summarization, sentiment, NER, translation, and more'
+- name: Protocol
+  description: 'Protocol discovery endpoints: MCP and A2A agent card'
+- name: DeFi
+  description: 'Decentralized finance: LP optimization, risk scoring, oracle guard, liquidation shield, bridge proof, contract audit, yield oracle'
+- name: Compliance
+  description: 'Regulatory compliance: EU AI Act, fairness, explainability, lineage, oversight, incidents, transparency'
+- name: Payments
+  description: Stripe payment sessions, price listing, and payment verification
+- name: Forge
+  description: 'Model marketplace: leaderboard, quarantine, verification, delta submission, badges'
+- name: Shield
+  description: 'AAAA Shield: post-quantum key exchange, session management, key rotation'
+- name: Delegation
+  description: UCAN delegation chain validation, revocation, and depth queries
+- name: UCAN
+  description: UCAN token creation, verification, revocation, and delegation
+- name: Keys
+  description: Cryptographic key generation, rotation, and revocation
+- name: Credits
+  description: Credit balance, usage history, and detailed usage breakdown
+- name: Audit
+  description: Audit event logging, trail retrieval, and export
+- name: Swarm
+  description: 'Swarm messaging: relay, broadcast, join, leave, topology, peers'
+- name: Trust
+  description: Bounded trust scoring and trust history (TCM-100-BoundedMonotonicity)
+- name: Reputation
+  description: 'Reputation ledger: record interactions, score queries, history'
+- name: Escrow
+  description: 'Agent-to-agent escrow: create, release, dispute, status'
+- name: SLA
+  description: 'SLA management: register, report violations, status checks'
+- name: VeriRand
+  description: Premium verifiable random bytes and batch/stream RNG
+- name: VRF
+  description: Verifiable random function for gaming draws and verification
+- name: Drift
+  description: DriftGuard model drift detection and certification
+- name: Identity
+  description: Agent identity registration, lookup, revocation, and challenges
+- name: LoRA
+  description: Federated LoRA training coordination and adapter registry
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Service health and version
+      description: Returns current service status, version, build date, entropy epoch, and HELIX subsystem flags.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 0.5.0
+                  build:
+                    type: string
+                    example: '2026-04-08'
+                  epoch:
+                    type: integer
+                    example: 17409216
+                  next_epoch_in_s:
+                    type: integer
+                    example: 45
+                  helix:
+                    $ref: '#/components/schemas/HelixStatus'
+              example:
+                status: ok
+                version: 0.5.0
+                build: '2026-04-08'
+                epoch: 17409216
+                next_epoch_in_s: 45
+                helix:
+                  anti_hallucination: true
+                  ecc_status: true
+                  integrity_parity: true
+  /openapi.json:
+    get:
+      operationId: getOpenApiSpec
+      summary: OpenAPI specification
+      description: Returns the full OpenAPI 3.x specification for this API.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: OpenAPI specification document
+          content:
+            application/json:
+              schema:
+                type: object
+  /.well-known/agent.json:
+    get:
+      operationId: getAgentCard
+      summary: A2A agent card
+      description: Returns the Google A2A protocol agent card for agent discovery and capability advertisement.
+      tags:
+      - Protocol
+      - Free
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+  /.well-known/mcp.json:
+    get:
+      operationId: getMcpManifest
+      summary: MCP server manifest
+      description: Returns the MCP server manifest for client auto-discovery.
+      tags:
+      - Protocol
+      - Free
+      responses:
+        '200':
+          description: MCP server manifest
+          content:
+            application/json:
+              schema:
+                type: object
+  /.well-known/ai-plugin.json:
+    get:
+      operationId: getAiPluginManifest
+      summary: OpenAI plugin manifest
+      description: Returns the OpenAI plugin manifest for ChatGPT plugin discovery.
+      tags:
+      - Protocol
+      - Free
+      responses:
+        '200':
+          description: OpenAI plugin manifest
+          content:
+            application/json:
+              schema:
+                type: object
+  /.well-known/pricing.json:
+    get:
+      operationId: getPricingManifest
+      summary: Machine-readable pricing
+      description: Returns machine-readable pricing for all API endpoints.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Pricing manifest
+          content:
+            application/json:
+              schema:
+                type: object
+  /.well-known/agent-card.json:
+    get:
+      operationId: getAgentCardAlt
+      summary: Alternative A2A agent card path
+      description: Alternative path for the A2A agent card, for compatibility with various A2A client implementations.
+      tags:
+      - Protocol
+      - Free
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/rag/augment:
+    post:
+      operationId: postTrustedRagAugment
+      summary: Trusted RAG augmentation
+      description: Returns public-safe grounded context, provenance hashes, freshness metadata, confidence, and a structured envelope.
+      tags: []
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Trusted RAG envelope
+          content:
+            application/json:
+              schema:
+                type: object
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/lora/buffer/capture:
+    post:
+      operationId: postLoraBufferCapture
+      summary: Capture scrubbed LoRA fix metadata
+      description: Stores only scrubbed sample metadata, digests, source hashes, quality score, and G18 bucket for later contribution.
+      tags:
+      - LoRA
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: LoRA buffer capture envelope
+          content:
+            application/json:
+              schema:
+                type: object
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/lora/buffer/inspect:
+    post:
+      operationId: postLoraBufferInspect
+      summary: Inspect public-safe LoRA buffer metadata
+      description: Returns pending sample digests, quality scores, eligible sample count, and public-safe buffer metrics.
+      tags:
+      - LoRA
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: LoRA buffer inspect envelope
+          content:
+            application/json:
+              schema:
+                type: object
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/oracle/entropy:
+    get:
+      operationId: getEntropyEpoch
+      summary: Entropy epoch oracle
+      description: Returns the current entropy epoch for zero-RTT A2A handshakes. No authentication required.
+      tags:
+      - Free
+      - Oracle
+      responses:
+        '200':
+          description: Current entropy epoch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  epoch:
+                    type: integer
+                    example: 17409216
+                  entropy:
+                    type: string
+                    example: a3f8c2...
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2026-04-09T12:00:00Z'
+                  source:
+                    type: string
+                    example: quantum_ensemble
+                  verified:
+                    type: boolean
+                    example: true
+              example:
+                epoch: 17409216
+                entropy: a3f8c2...
+                timestamp: '2026-04-09T12:00:00Z'
+                source: quantum_ensemble
+                verified: true
+  /v1/rng/quantum:
+    get:
+      operationId: getQuantumRng
+      summary: Quantum random number with proof
+      description: Returns a verifiable quantum random value with cryptographic proof. No authentication required.
+      tags:
+      - Free
+      - Oracle
+      responses:
+        '200':
+          description: Quantum random value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  random:
+                    type: string
+                    example: 0x7f3a8c2e9d1b4a6f...
+                  bits:
+                    type: integer
+                    example: 256
+                  source:
+                    type: string
+                    example: quantum
+                  verified:
+                    type: boolean
+                    example: true
+                  epoch:
+                    type: integer
+                    example: 17409216
+              example:
+                random: 0x7f3a8c2e9d1b4a6f...
+                bits: 256
+                source: quantum
+                verified: true
+                epoch: 17409216
+  /v1/rng/verify:
+    get:
+      operationId: verifyRng
+      summary: Verify current epoch random value
+      description: Verify that the current epoch random value is valid and has not been tampered with.
+      tags:
+      - Free
+      - Oracle
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  epoch:
+                    type: integer
+                  valid:
+                    type: boolean
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+  /v1/rng/seeded:
+    post:
+      operationId: seededRng
+      summary: Seeded deterministic RNG
+      description: Generate deterministic random values from a provided seed. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - seed
+              properties:
+                seed:
+                  type: string
+                  example: my-deterministic-seed
+                count:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Deterministic random values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                  seed:
+                    type: string
+                  count:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/rng/batch:
+    post:
+      operationId: batchRng
+      summary: Batch random generation
+      description: Generate a batch of random values in a single request. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - count
+              properties:
+                count:
+                  type: integer
+                  example: 100
+                bits:
+                  type: integer
+                  example: 256
+      responses:
+        '200':
+          description: Batch random values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                  count:
+                    type: integer
+                  bits:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/rng/stream:
+    post:
+      operationId: streamRng
+      summary: Streaming random values
+      description: Stream random values via Server-Sent Events. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 1000
+                bits:
+                  type: integer
+                  example: 256
+                interval_ms:
+                  type: integer
+                  example: 100
+      responses:
+        '200':
+          description: SSE stream of random values
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events stream of random values
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/verirand/bytes:
+    post:
+      operationId: verirandBytes
+      summary: Premium verifiable random bytes
+      description: Generate premium verifiable random bytes with cryptographic proof. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - length
+              properties:
+                length:
+                  type: integer
+                  example: 32
+                  description: Number of bytes to generate
+      responses:
+        '200':
+          description: Verifiable random bytes with proof
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bytes:
+                    type: string
+                    description: Hex-encoded random bytes
+                  length:
+                    type: integer
+                  proof:
+                    type: string
+                  verified:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/register:
+    post:
+      operationId: registerAgent
+      summary: Register an agent
+      description: Register an agent in the swarm topology. Compatible with the Google A2A protocol. No authentication required.
+      tags:
+      - Free
+      - Agents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - capabilities
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - inference
+                  - planning
+                  - code-generation
+      responses:
+        '200':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                    example: my-agent-001
+                  registered_at:
+                    type: string
+                    format: date-time
+                    example: '2026-04-09T14:30:00Z'
+                  status:
+                    type: string
+                    example: active
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - inference
+                    - planning
+              example:
+                agent_id: my-agent-001
+                registered_at: '2026-04-09T14:30:00Z'
+                status: active
+                capabilities:
+                - inference
+                - planning
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /v1/agents/topology:
+    get:
+      operationId: getSwarmTopology
+      summary: Live swarm topology
+      description: Returns live swarm topology statistics for all registered agents. No authentication required.
+      tags:
+      - Free
+      - Agents
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                    example: 1247
+                  edges:
+                    type: integer
+                    example: 3891
+                  average_degree:
+                    type: number
+                    format: float
+                    example: 3.1
+                  components:
+                    type: integer
+                    example: 5
+                  largest_component_size:
+                    type: integer
+                    example: 1240
+              example:
+                agents: 1247
+                edges: 3891
+                average_degree: 3.1
+                components: 5
+                largest_component_size: 1240
+  /v1/agents/status:
+    get:
+      operationId: getAgentStatus
+      summary: Agent status lookup
+      description: Look up the current status of a registered agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - inactive
+                    - suspended
+                  last_seen:
+                    type: string
+                    format: date-time
+                  uptime_s:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/capabilities:
+    get:
+      operationId: getAgentCapabilities
+      summary: List agent capabilities
+      description: List the registered capabilities for a specific agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent capabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/search:
+    get:
+      operationId: searchAgents
+      summary: Search agents by capability
+      description: Search for agents that provide a specific capability.
+      tags:
+      - Agents
+      parameters:
+      - name: capability
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Capability to search for
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Matching agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/health:
+    get:
+      operationId: getAgentHealth
+      summary: Agent health check
+      description: Check the health status of a specific agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  healthy:
+                    type: boolean
+                  last_heartbeat:
+                    type: string
+                    format: date-time
+                  latency_ms:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/discover:
+    get:
+      operationId: discoverAgents
+      summary: Discover agents (A2A compatible)
+      description: Discover available agents in the network. Compatible with Google A2A discovery protocol.
+      tags:
+      - Free
+      - Agents
+      responses:
+        '200':
+          description: List of discoverable agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+  /v1/agents/update:
+    post:
+      operationId: updateAgent
+      summary: Update agent capabilities
+      description: Update the capabilities and metadata of a registered agent.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Agent updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/deregister:
+    post:
+      operationId: deregisterAgent
+      summary: Deregister an agent
+      description: Remove an agent from the swarm topology.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Agent deregistered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  deregistered_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: deregistered
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/message:
+    post:
+      operationId: messageAgent
+      summary: Send direct message to agent
+      description: Send a direct message to a specific agent in the swarm.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target_agent_id
+              - message
+              properties:
+                target_agent_id:
+                  type: string
+                message:
+                  type: object
+                sender_agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Message delivered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: string
+                  delivered:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/negotiate:
+    post:
+      operationId: negotiateAgents
+      summary: Negotiate terms between agents
+      description: Negotiate terms and conditions between two agents for a collaborative task.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - initiator_id
+              - responder_id
+              - terms
+              properties:
+                initiator_id:
+                  type: string
+                responder_id:
+                  type: string
+                terms:
+                  type: object
+      responses:
+        '200':
+          description: Negotiation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  negotiation_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - accepted
+                    - rejected
+                    - pending
+                  agreed_terms:
+                    type: object
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/delegate:
+    post:
+      operationId: delegateTask
+      summary: Delegate task to another agent
+      description: Delegate a task to another agent in the swarm network.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from_agent_id
+              - to_agent_id
+              - task
+              properties:
+                from_agent_id:
+                  type: string
+                to_agent_id:
+                  type: string
+                task:
+                  type: object
+      responses:
+        '200':
+          description: Task delegated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delegation_id:
+                    type: string
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/semantic-diff:
+    post:
+      operationId: semanticDiff
+      summary: Semantic diff between agent outputs
+      description: Compute a semantic diff between two agent outputs to identify meaningful differences. Costs $0.04/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - output_a
+              - output_b
+              properties:
+                output_a:
+                  type: string
+                output_b:
+                  type: string
+                context:
+                  type: string
+      responses:
+        '200':
+          description: Semantic diff result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  similarity_score:
+                    type: number
+                    format: float
+                  differences:
+                    type: array
+                    items:
+                      type: object
+                  summary:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/contradiction:
+    post:
+      operationId: detectContradiction
+      summary: Detect contradictions in agent outputs
+      description: Detect logical contradictions between agent outputs. Costs $0.02/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - statements
+              properties:
+                statements:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - The model accuracy is 95%
+                  - The model fails 20% of the time
+      responses:
+        '200':
+          description: Contradiction detection result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contradictions_found:
+                    type: boolean
+                  contradictions:
+                    type: array
+                    items:
+                      type: object
+                  confidence:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/swarm/inbox:
+    get:
+      operationId: pollSwarmInbox
+      summary: Poll swarm inbox
+      description: Poll queued messages for the registered agent. No authentication required.
+      tags:
+      - Free
+      - Agents
+      responses:
+        '200':
+          description: Queued messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /v1/swarm/relay:
+    post:
+      operationId: swarmRelay
+      summary: Relay message through swarm
+      description: Relay a message through the swarm network to reach a target agent.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target_agent_id
+              - message
+              properties:
+                target_agent_id:
+                  type: string
+                message:
+                  type: object
+                ttl:
+                  type: integer
+                  description: Hop limit for relay
+      responses:
+        '200':
+          description: Message relayed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay_id:
+                    type: string
+                  hops:
+                    type: integer
+                  delivered:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/swarm/broadcast:
+    post:
+      operationId: swarmBroadcast
+      summary: Broadcast to all swarm members
+      description: Broadcast a message to all members of the swarm group.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - message
+              properties:
+                message:
+                  type: object
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Broadcast sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  broadcast_id:
+                    type: string
+                  recipients:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/swarm/join:
+    post:
+      operationId: swarmJoin
+      summary: Join swarm group
+      description: Join a swarm group to receive broadcasts and participate in swarm activities.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Joined swarm group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  group_id:
+                    type: string
+                  joined_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/swarm/leave:
+    post:
+      operationId: swarmLeave
+      summary: Leave swarm group
+      description: Leave a swarm group.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Left swarm group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  group_id:
+                    type: string
+                  left_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/swarm/topology:
+    get:
+      operationId: getSwarmScopedTopology
+      summary: Swarm-scoped topology
+      description: Returns swarm-scoped topology. Same data as /v1/agents/topology but scoped to the swarm group.
+      tags:
+      - Free
+      - Swarm
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                  edges:
+                    type: integer
+                  average_degree:
+                    type: number
+                    format: float
+                  components:
+                    type: integer
+  /v1/swarm/peers:
+    get:
+      operationId: getSwarmPeers
+      summary: List swarm peers
+      description: List all peers in the swarm group.
+      tags:
+      - Free
+      - Swarm
+      responses:
+        '200':
+          description: Swarm peers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  peers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        status:
+                          type: string
+                        joined_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+  /v1/oracle/hallucination:
+    post:
+      operationId: detectHallucination
+      summary: Hallucination oracle
+      description: Detect hallucinations with a certified upper bound. Returns a formally proved hallucination probability bound. Costs $0.002/call.
+      tags:
+      - Oracle
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - claim
+              properties:
+                claim:
+                  type: string
+                  example: Water boils at 100Â°C at sea level
+                context:
+                  type: string
+                  example: physics
+      responses:
+        '200':
+          description: Hallucination analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  claim:
+                    type: string
+                  context:
+                    type: string
+                  hallucination_bound:
+                    type: number
+                    format: float
+                    example: 0.0012
+                  verified:
+                    type: boolean
+                    example: true
+                  proof_type:
+                    type: string
+                    example: formal
+                  timestamp:
+                    type: string
+                    format: date-time
+              example:
+                claim: The capital of France is Paris
+                context: geography
+                hallucination_bound: 0.0012
+                verified: true
+                proof_type: formal
+                timestamp: '2026-04-09T14:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/register:
+    post:
+      operationId: ratchetRegisterSession
+      summary: RatchetGate â€” register session
+      description: Register a new RatchetGate session to mitigate session fixation attacks. Costs $0.002/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  example: sess-001
+      responses:
+        '200':
+          description: Session registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  registered_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: registered
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/advance:
+    post:
+      operationId: ratchetAdvanceSession
+      summary: RatchetGate â€” advance session
+      description: Advance the session ratchet window to trigger re-keying. Costs $0.002/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  example: sess-001
+      responses:
+        '200':
+          description: Session advanced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  advanced_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: advanced
+                  window:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/probe:
+    get:
+      operationId: ratchetProbe
+      summary: RatchetGate â€” health probe
+      description: Health probe for a ratchet session. Free endpoint.
+      tags:
+      - Free
+      - Security
+      responses:
+        '200':
+          description: Ratchet probe result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active_sessions:
+                    type: integer
+                  healthy:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+  /v1/ratchet/status:
+    get:
+      operationId: ratchetStatus
+      summary: RatchetGate â€” session status
+      description: Check the status of a ratchet session. Costs $0.004/call.
+      tags:
+      - Security
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Session identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Session status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - expired
+                    - revoked
+                  window:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  last_advanced:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/revoke:
+    post:
+      operationId: ratchetRevoke
+      summary: RatchetGate â€” revoke session
+      description: Revoke a ratchet session, invalidating all associated keys.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Session revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  revoked_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: revoked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/verify:
+    post:
+      operationId: ratchetVerify
+      summary: RatchetGate â€” verify session integrity
+      description: Verify the integrity of a ratchet session, ensuring no tampering has occurred.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Session integrity result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  integrity_valid:
+                    type: boolean
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ratchet/list:
+    get:
+      operationId: ratchetList
+      summary: RatchetGate â€” list active sessions
+      description: List all active ratchet sessions. Requires API key.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Active sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        session_id:
+                          type: string
+                        status:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/identity/verify:
+    post:
+      operationId: verifyIdentity
+      summary: Topological identity verification
+      description: Verify agent identity in untrusted networks with Sybil-resistance and a formally proved depth limit. Costs $0.020/call.
+      tags:
+      - Security
+      - Identity
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Identity verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  verified:
+                    type: boolean
+                  sybil_resistant:
+                    type: boolean
+                  depth_limit_proved:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/identity/register:
+    post:
+      operationId: registerIdentity
+      summary: Register agent identity
+      description: Register a new agent identity in the identity registry.
+      tags:
+      - Identity
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                public_key:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Identity registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  registered_at:
+                    type: string
+                    format: date-time
+                  identity_hash:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/identity/lookup:
+    get:
+      operationId: lookupIdentity
+      summary: Lookup registered identity
+      description: Look up a registered identity by agent ID.
+      tags:
+      - Identity
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Identity details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  public_key:
+                    type: string
+                  registered_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/identity/revoke:
+    post:
+      operationId: revokeIdentity
+      summary: Revoke agent identity
+      description: Revoke a registered agent identity.
+      tags:
+      - Identity
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Identity revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  revoked_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: revoked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/identity/challenge:
+    post:
+      operationId: challengeIdentity
+      summary: Issue identity challenge
+      description: Issue a cryptographic challenge to verify an agent's identity.
+      tags:
+      - Identity
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Challenge issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge_id:
+                    type: string
+                  nonce:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/identity/sybil-check:
+    get:
+      operationId: sybilCheck
+      summary: Sybil-resistance check
+      description: Sybil-resistance check on the calling IP address. Free endpoint.
+      tags:
+      - Free
+      - Identity
+      responses:
+        '200':
+          description: Sybil check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ip:
+                    type: string
+                  sybil_score:
+                    type: number
+                    format: float
+                  suspicious:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+  /v1/threat/score:
+    post:
+      operationId: scoreThreat
+      summary: Multi-vector threat score
+      description: Compute a multi-vector threat score (velocity, behavioral, and intent) for an agent interaction. Costs $0.003/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                context:
+                  type: string
+                  example: multi-agent-transaction
+      responses:
+        '200':
+          description: Threat score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  threat_score:
+                    type: number
+                    format: float
+                  velocity_score:
+                    type: number
+                    format: float
+                  behavioral_score:
+                    type: number
+                    format: float
+                  intent_score:
+                    type: number
+                    format: float
+                  verdict:
+                    type: string
+                    enum:
+                    - safe
+                    - suspicious
+                    - threat
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/threat/analyze:
+    post:
+      operationId: analyzeThreat
+      summary: Deep threat analysis
+      description: Perform deep threat analysis on an agent or interaction pattern.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                interaction_log:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Threat analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  findings:
+                    type: array
+                    items:
+                      type: object
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/threat/report:
+    post:
+      operationId: reportThreat
+      summary: Report a threat incident
+      description: Report a threat incident involving a specific agent.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - description
+              properties:
+                agent_id:
+                  type: string
+                description:
+                  type: string
+                severity:
+                  type: string
+                  enum:
+                  - low
+                  - medium
+                  - high
+                  - critical
+                evidence:
+                  type: object
+      responses:
+        '200':
+          description: Threat reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/threat/block:
+    post:
+      operationId: blockThreat
+      summary: Block a threatening agent
+      description: Block a threatening agent from further interactions.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                reason:
+                  type: string
+                duration_s:
+                  type: integer
+                  description: Block duration in seconds, 0 for permanent
+      responses:
+        '200':
+          description: Agent blocked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  blocked_at:
+                    type: string
+                    format: date-time
+                  expires_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: blocked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/threat/history:
+    get:
+      operationId: getThreatHistory
+      summary: Threat history for an agent
+      description: Retrieve the threat history for a specific agent.
+      tags:
+      - Security
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Threat history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        event_type:
+                          type: string
+                        severity:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/trust/decay:
+    get:
+      operationId: getTrustDecay
+      summary: Current trust ceiling value
+      description: Returns the current trust ceiling value, reflecting the bounded monotonicity decay. Free endpoint.
+      tags:
+      - Free
+      - Trust
+      responses:
+        '200':
+          description: Trust decay value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ceiling:
+                    type: number
+                    format: float
+                  decay_rate:
+                    type: number
+                    format: float
+                  epoch:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+  /v1/trust/score:
+    post:
+      operationId: getTrustScore
+      summary: Bounded trust score
+      description: Compute a bounded trust score for on-chain governance (TCM-100-BoundedMonotonicity). Costs $0.04/call.
+      tags:
+      - Trust
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Trust score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  trust_score:
+                    type: number
+                    format: float
+                  bounded:
+                    type: boolean
+                  ceiling:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/trust/history:
+    get:
+      operationId: getTrustHistory
+      summary: Trust score history
+      description: Retrieve trust score history for an agent. Costs $0.04/query.
+      tags:
+      - Trust
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Trust score history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        trust_score:
+                          type: number
+                          format: float
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/check:
+    post:
+      operationId: checkCompliance
+      summary: GDPR/CCPA compliance gate
+      description: Verify regulatory compliance for a data operation with formal proof. Supports GDPR and CCPA jurisdictions. Costs $0.005/call.
+      tags:
+      - Security
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data_type
+              - jurisdiction
+              - operation
+              properties:
+                data_type:
+                  type: string
+                  example: user_pii
+                jurisdiction:
+                  type: string
+                  example: EU
+                operation:
+                  type: string
+                  example: store
+      responses:
+        '200':
+          description: Compliance check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data_type:
+                    type: string
+                  jurisdiction:
+                    type: string
+                  operation:
+                    type: string
+                  compliant:
+                    type: boolean
+                  proof_type:
+                    type: string
+                    example: formal
+                  regulations:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - GDPR
+                    - CCPA
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/eu-ai-act:
+    post:
+      operationId: euAiActCertificate
+      summary: EU AI Act compliance certificate
+      description: Generate an EU AI Act compliance certificate for an AI system. Costs $0.04/check.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - risk_category
+              - intended_purpose
+              properties:
+                system_id:
+                  type: string
+                risk_category:
+                  type: string
+                  enum:
+                  - minimal
+                  - limited
+                  - high
+                  - unacceptable
+                intended_purpose:
+                  type: string
+      responses:
+        '200':
+          description: EU AI Act certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  system_id:
+                    type: string
+                  compliant:
+                    type: boolean
+                  risk_category:
+                    type: string
+                  requirements:
+                    type: array
+                    items:
+                      type: object
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/fairness:
+    post:
+      operationId: fairnessProof
+      summary: Fairness proof (FNS-100-FairnessBound)
+      description: Generate a fairness proof certificate for a model. Costs $0.04/check.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - dataset_id
+              - protected_attrs
+              - metric
+              properties:
+                model_id:
+                  type: string
+                dataset_id:
+                  type: string
+                protected_attrs:
+                  type: array
+                  items:
+                    type: string
+                metric:
+                  type: string
+                  example: demographic_parity
+      responses:
+        '200':
+          description: Fairness proof certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  model_id:
+                    type: string
+                  fair:
+                    type: boolean
+                  metric_value:
+                    type: number
+                    format: float
+                  bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/explain:
+    post:
+      operationId: explainabilityCertificate
+      summary: Explainability certificate (XPL-100-ExplainBound)
+      description: Generate an explainability certificate for a model decision. Costs $0.04/call.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - decision_id
+              - subject_context
+              properties:
+                model_id:
+                  type: string
+                decision_id:
+                  type: string
+                subject_context:
+                  type: object
+      responses:
+        '200':
+          description: Explainability certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  explanation:
+                    type: string
+                  features:
+                    type: array
+                    items:
+                      type: object
+                  explainability_score:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/lineage:
+    post:
+      operationId: dataLineage
+      summary: Data lineage (LIN-100-ChainIntegrity)
+      description: Verify data lineage chain integrity. Costs $0.04/call.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - dataset_stages
+              properties:
+                model_id:
+                  type: string
+                dataset_stages:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Data lineage verification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  chain_valid:
+                    type: boolean
+                  stages_verified:
+                    type: integer
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/oversight:
+    post:
+      operationId: logOversight
+      summary: Log oversight event
+      description: Log a human oversight event for an AI system. Costs $0.02/event.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - reviewer_id
+              - decision
+              - notes
+              properties:
+                system_id:
+                  type: string
+                reviewer_id:
+                  type: string
+                decision:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Oversight event logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: string
+                  system_id:
+                    type: string
+                  logged_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/oversight/history:
+    get:
+      operationId: getOversightHistory
+      summary: Oversight history
+      description: Retrieve oversight event history for a system. Costs $0.02/query.
+      tags:
+      - Compliance
+      parameters:
+      - name: system_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: System identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Oversight history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  system_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/incident:
+    post:
+      operationId: reportIncident
+      summary: Report compliance incident
+      description: Report an AI system compliance incident. Costs $0.02/report.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - severity
+              - description
+              - affected_users
+              properties:
+                system_id:
+                  type: string
+                severity:
+                  type: string
+                  enum:
+                  - low
+                  - medium
+                  - high
+                  - critical
+                description:
+                  type: string
+                affected_users:
+                  type: integer
+      responses:
+        '200':
+          description: Incident reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  incident_id:
+                    type: string
+                  system_id:
+                    type: string
+                  status:
+                    type: string
+                  reported_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/incidents:
+    get:
+      operationId: getIncidents
+      summary: Incident registry
+      description: Retrieve the incident registry for a system. Costs $0.02/query.
+      tags:
+      - Compliance
+      parameters:
+      - name: system_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: System identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Incident registry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  system_id:
+                    type: string
+                  incidents:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/compliance/transparency:
+    post:
+      operationId: transparencyReport
+      summary: Transparency report
+      description: Generate a transparency report for an AI system. Costs $0.08/report.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - period
+              - include
+              properties:
+                system_id:
+                  type: string
+                period:
+                  type: string
+                  example: 2026-Q1
+                include:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - incidents
+                  - oversight
+                  - fairness
+      responses:
+        '200':
+          description: Transparency report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  system_id:
+                    type: string
+                  period:
+                    type: string
+                  sections:
+                    type: object
+                  generated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/drift/check:
+    post:
+      operationId: driftCheck
+      summary: DriftGuard check (DRG-100-DriftBound)
+      description: Check for model drift between reference and current windows. Costs $0.01/check.
+      tags:
+      - Drift
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - reference_window
+              - current_window
+              properties:
+                model_id:
+                  type: string
+                reference_window:
+                  type: object
+                current_window:
+                  type: object
+      responses:
+        '200':
+          description: Drift check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  drift_detected:
+                    type: boolean
+                  drift_score:
+                    type: number
+                    format: float
+                  bound:
+                    type: number
+                    format: float
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/drift/certificate:
+    get:
+      operationId: getDriftCertificate
+      summary: Drift certificate
+      description: Retrieve a drift certificate by ID. Costs $0.01/cert.
+      tags:
+      - Drift
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Drift certificate ID
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Drift certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  model_id:
+                    type: string
+                  drift_score:
+                    type: number
+                    format: float
+                  issued_at:
+                    type: string
+                    format: date-time
+                  valid_until:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/inference:
+    post:
+      operationId: chatInference
+      summary: Chat inference with hallucination guard
+      description: LLM chat completion with built-in hallucination guard and safety guarantees. Costs $0.015/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - messages
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                  example:
+                  - role: user
+                    content: What is formal verification?
+      responses:
+        '200':
+          description: Chat completion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  hallucination_bound:
+                    type: number
+                    format: float
+                  verified:
+                    type: boolean
+                  usage:
+                    type: object
+                    properties:
+                      prompt_tokens:
+                        type: integer
+                      completion_tokens:
+                        type: integer
+                      total_tokens:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/inference/stream:
+    post:
+      operationId: streamInference
+      summary: Streaming inference with chain-of-thought
+      description: Streaming LLM inference via Server-Sent Events (SSE) with reasoning trace. Costs $0.025/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - messages
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                  example:
+                  - role: user
+                    content: Explain formal verification step by step.
+      responses:
+        '200':
+          description: SSE stream of completion chunks and chain-of-thought
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events stream. Each event is a JSON object with a 'type' field ('thinking', 'content', or 'done').
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/inference/embeddings:
+    post:
+      operationId: inferenceEmbeddings
+      summary: Generate embeddings
+      description: Generate text embeddings using the inference engine. Costs $0.01/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - input
+              properties:
+                input:
+                  type: string
+                model:
+                  type: string
+      responses:
+        '200':
+          description: Embeddings result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embedding:
+                    type: array
+                    items:
+                      type: number
+                  dimensions:
+                    type: integer
+                  model:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/inference/classify:
+    post:
+      operationId: inferenceClassify
+      summary: Text classification via inference
+      description: Classify text using the inference engine. Costs $0.01/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/inference/models:
+    get:
+      operationId: listInferenceModels
+      summary: List available inference models
+      description: List all available inference models. Free endpoint.
+      tags:
+      - Free
+      - Inference
+      responses:
+        '200':
+          description: Available models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        context_length:
+                          type: integer
+  /v1/compress:
+    post:
+      operationId: compressData
+      summary: HELIX tensor compression
+      description: Compress data using HELIX tensor compression. Free tier and paid pro tier available.
+      tags:
+      - Free
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: string
+                  description: Data to compress
+      responses:
+        '200':
+          description: Compressed output
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compressed:
+                    type: string
+                  original_size:
+                    type: integer
+                  compressed_size:
+                    type: integer
+                  ratio:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /v1/agents/plan:
+    post:
+      operationId: planAgentGoal
+      summary: Autonomous agent goal planning
+      description: Decompose a goal into an action plan for autonomous agent execution. Costs $0.015/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - goal
+              properties:
+                goal:
+                  type: string
+                  example: Deploy a web service with zero downtime
+                constraints:
+                  type: object
+                  description: Optional constraints for the plan (e.g., time limits, resource caps)
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Goal decomposition and action plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  goal:
+                    type: string
+                  steps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        step:
+                          type: integer
+                        action:
+                          type: string
+                        description:
+                          type: string
+                  estimated_complexity:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/intent-classify:
+    post:
+      operationId: classifyAgentIntent
+      summary: Agent intent classification
+      description: Classify agent intent from natural language text. Returns the top-3 intent classifications. Costs $0.005/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: I need to fetch user data and store it in the database
+      responses:
+        '200':
+          description: Top-3 intent classifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  intents:
+                    type: array
+                    maxItems: 3
+                    items:
+                      type: object
+                      properties:
+                        intent:
+                          type: string
+                        confidence:
+                          type: number
+                          format: float
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/agents/reputation:
+    post:
+      operationId: getAgentReputation
+      summary: Agent reputation and trust score
+      description: Get the A2A trust score and compliance status for an agent. Costs $0.010/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Agent reputation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  trust_score:
+                    type: number
+                    format: float
+                  compliance_status:
+                    type: string
+                    enum:
+                    - compliant
+                    - non_compliant
+                    - unknown
+                  interactions:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/summarize:
+    post:
+      operationId: summarizeText
+      summary: Text summarization
+      description: Generate an extractive summary of the provided text. Costs $0.010/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: Formal verification is the act of proving or disproving the correctness of intended algorithms underlying a system with respect to a certain formal specification or property, using formal methods of mathematics.
+      responses:
+        '200':
+          description: Extractive summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: string
+                  original_length:
+                    type: integer
+                  summary_length:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/sentiment:
+    post:
+      operationId: analyzeSentiment
+      summary: Sentiment analysis
+      description: Classify the sentiment of the provided text. Costs $0.005/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: This API is incredibly reliable and easy to use.
+      responses:
+        '200':
+          description: Sentiment classification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sentiment:
+                    type: string
+                    enum:
+                    - positive
+                    - negative
+                    - neutral
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+                    properties:
+                      positive:
+                        type: number
+                        format: float
+                      negative:
+                        type: number
+                        format: float
+                      neutral:
+                        type: number
+                        format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/ner:
+    post:
+      operationId: textNer
+      summary: Named entity recognition
+      description: Extract named entities from text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Named entities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                        label:
+                          type: string
+                        start:
+                          type: integer
+                        end:
+                          type: integer
+                        confidence:
+                          type: number
+                          format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/translate:
+    post:
+      operationId: textTranslate
+      summary: Text translation
+      description: Translate text to a target language. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              - target_language
+              properties:
+                text:
+                  type: string
+                target_language:
+                  type: string
+                  example: es
+                source_language:
+                  type: string
+                  example: en
+      responses:
+        '200':
+          description: Translation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  translated_text:
+                    type: string
+                  source_language:
+                    type: string
+                  target_language:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/classify:
+    post:
+      operationId: textClassify
+      summary: Text classification
+      description: Classify text into predefined or custom categories. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/embed:
+    post:
+      operationId: textEmbed
+      summary: Text embeddings
+      description: Generate text embeddings for semantic similarity and search. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Embedding result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embedding:
+                    type: array
+                    items:
+                      type: number
+                  dimensions:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/keywords:
+    post:
+      operationId: textKeywords
+      summary: Keyword extraction
+      description: Extract keywords and key phrases from text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                max_keywords:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Keywords
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keywords:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        keyword:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/similarity:
+    post:
+      operationId: textSimilarity
+      summary: Text similarity scoring
+      description: Compute semantic similarity between two texts. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text_a
+              - text_b
+              properties:
+                text_a:
+                  type: string
+                text_b:
+                  type: string
+      responses:
+        '200':
+          description: Similarity result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  similarity:
+                    type: number
+                    format: float
+                  method:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/rewrite:
+    post:
+      operationId: textRewrite
+      summary: Text rewriting
+      description: Rewrite text in a different style or tone. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                style:
+                  type: string
+                  example: formal
+      responses:
+        '200':
+          description: Rewritten text
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rewritten_text:
+                    type: string
+                  style:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/extract:
+    post:
+      operationId: textExtract
+      summary: Structured data extraction
+      description: Extract structured data from unstructured text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                schema:
+                  type: object
+                  description: Expected output schema
+      responses:
+        '200':
+          description: Extracted structured data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  extracted:
+                    type: object
+                  confidence:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/detect-language:
+    post:
+      operationId: textDetectLanguage
+      summary: Language detection
+      description: Detect the language of the provided text. Costs $0.01/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Language detection result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    type: string
+                    example: en
+                  confidence:
+                    type: number
+                    format: float
+                  alternatives:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/text/tokenize:
+    post:
+      operationId: textTokenize
+      summary: Tokenization
+      description: Tokenize text into tokens. Costs $0.01/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Tokenization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    type: array
+                    items:
+                      type: string
+                  token_count:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/metrics:
+    get:
+      operationId: getMetrics
+      summary: Platform metrics
+      description: 'Returns platform metrics: endpoint count, pricing tiers, uptime. Free endpoint.'
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Platform metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_count:
+                    type: integer
+                  uptime_percent:
+                    type: number
+                    format: float
+                  total_requests_24h:
+                    type: integer
+                  active_agents:
+                    type: integer
+  /v1/embed:
+    get:
+      operationId: getHelixManifest
+      summary: HELIX compression service manifest
+      description: Returns the HELIX compression service manifest. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: HELIX manifest
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/bitnet/models:
+    get:
+      operationId: getBitnetModels
+      summary: BitNet/HELIX model catalog
+      description: Returns a catalog of BitNet/HELIX compressed model downloads. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Model catalog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        size_mb:
+                          type: integer
+                        compression:
+                          type: string
+                        download_url:
+                          type: string
+  /v1/payments/stripe/session:
+    post:
+      operationId: createStripeSession
+      summary: Create Stripe Checkout session
+      description: Create a Stripe Checkout session for purchasing credit or prompt packs. No authentication required.
+      tags:
+      - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - price_id
+              properties:
+                price_id:
+                  type: string
+                  description: Stripe price ID
+                success_url:
+                  type: string
+                cancel_url:
+                  type: string
+      responses:
+        '200':
+          description: Stripe Checkout session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  url:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /v1/payments/stripe/prices:
+    get:
+      operationId: getStripePrices
+      summary: List active Stripe prices
+      description: List all active Stripe prices for credit and prompt packs. No authentication required.
+      tags:
+      - Payments
+      responses:
+        '200':
+          description: Active Stripe prices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        amount:
+                          type: integer
+                        currency:
+                          type: string
+                        credits:
+                          type: integer
+  /v1/pay/verify:
+    post:
+      operationId: verifyPayment
+      summary: Verify payment and retrieve API key
+      description: Verify a completed payment and retrieve the associated API key. No authentication required.
+      tags:
+      - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  description: Stripe Checkout session ID
+      responses:
+        '200':
+          description: Payment verified, API key returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  api_key:
+                    type: string
+                  credits:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /v1/forge/leaderboard:
+    get:
+      operationId: getForgeLeaderboard
+      summary: Model leaderboard
+      description: Browse the model leaderboard. Free endpoint.
+      tags:
+      - Free
+      - Forge
+      responses:
+        '200':
+          description: Model leaderboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                        rank:
+                          type: integer
+  /v1/forge/quarantine:
+    get:
+      operationId: getForgeQuarantine
+      summary: Quarantined models
+      description: View quarantined models that failed verification. Free endpoint.
+      tags:
+      - Free
+      - Forge
+      responses:
+        '200':
+          description: Quarantined models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        reason:
+                          type: string
+                        quarantined_at:
+                          type: string
+                          format: date-time
+  /v1/forge/verify:
+    post:
+      operationId: verifyForgeModel
+      summary: Verify a model submission
+      description: Verify a model submission for the Forge marketplace. Requires API key.
+      tags:
+      - Forge
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              properties:
+                model_id:
+                  type: string
+                verification_type:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  verified:
+                    type: boolean
+                  issues:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/forge/delta/submit:
+    post:
+      operationId: submitForgeDelta
+      summary: Submit a model delta
+      description: Submit a model delta (incremental update) to the Forge marketplace. Requires API key.
+      tags:
+      - Forge
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - delta
+              properties:
+                model_id:
+                  type: string
+                delta:
+                  type: object
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Delta submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delta_id:
+                    type: string
+                  model_id:
+                    type: string
+                  status:
+                    type: string
+                  submitted_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/forge/badge/{model}:
+    get:
+      operationId: getForgeBadge
+      summary: Model quality badge
+      description: Get a quality badge for a model. Free endpoint.
+      tags:
+      - Free
+      - Forge
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Model identifier
+      responses:
+        '200':
+          description: Model badge
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  badge:
+                    type: string
+                    enum:
+                    - gold
+                    - silver
+                    - bronze
+                    - none
+                  score:
+                    type: number
+                    format: float
+                  verified:
+                    type: boolean
+  /v1/defi/optimize:
+    post:
+      operationId: defiOptimize
+      summary: LP parameter optimization (DFP-100-OptimalTick)
+      description: 'Optimize liquidity provider parameters for DeFi positions. Fee: $0.08 + 0.2% of position size.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - protocol
+              - position
+              - risk_tolerance
+              properties:
+                protocol:
+                  type: string
+                  example: uniswap_v3
+                position:
+                  type: object
+                  properties:
+                    token_a:
+                      type: string
+                      example: ETH
+                    token_b:
+                      type: string
+                      example: USDC
+                    amount_usd:
+                      type: number
+                      example: 10000
+                risk_tolerance:
+                  type: number
+                  format: float
+                  example: 0.5
+      responses:
+        '200':
+          description: Optimization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optimal_tick_lower:
+                    type: integer
+                  optimal_tick_upper:
+                    type: integer
+                  expected_apr:
+                    type: number
+                    format: float
+                  impermanent_loss_bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/risk-score:
+    post:
+      operationId: defiRiskScore
+      summary: DeFi risk scoring (DFI-101-RiskScoreBound)
+      description: Compute a risk score for a DeFi position. Costs $0.08/call.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - protocol
+              - position
+              - market_conditions
+              properties:
+                protocol:
+                  type: string
+                position:
+                  type: object
+                market_conditions:
+                  type: object
+      responses:
+        '200':
+          description: Risk score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_score:
+                    type: number
+                    format: float
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  factors:
+                    type: array
+                    items:
+                      type: object
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/oracle-verify:
+    post:
+      operationId: defiOracleVerify
+      summary: Oracle guard (OGD-100-ManipulationBound)
+      description: 'Verify oracle integrity and detect price manipulation. Fee: $0.04 + 0.1% of tvl_at_risk.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - oracle_address
+              - price_feed
+              - reference_price
+              - asset
+              - tvl_at_risk
+              properties:
+                oracle_address:
+                  type: string
+                price_feed:
+                  type: string
+                reference_price:
+                  type: number
+                asset:
+                  type: string
+                tvl_at_risk:
+                  type: number
+      responses:
+        '200':
+          description: Oracle verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  oracle_valid:
+                    type: boolean
+                  deviation:
+                    type: number
+                    format: float
+                  manipulation_bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/liquidation-check:
+    post:
+      operationId: defiLiquidationCheck
+      summary: Liquid Shield (LQS-100-LiquidationBound)
+      description: 'Check liquidation risk for a DeFi position. Fee: $0.04 + 1% of net equity.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - position_id
+              - collateral_value
+              - debt_value
+              - collateral_factor
+              properties:
+                position_id:
+                  type: string
+                collateral_value:
+                  type: number
+                debt_value:
+                  type: number
+                collateral_factor:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Liquidation check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  at_risk:
+                    type: boolean
+                  health_factor:
+                    type: number
+                    format: float
+                  liquidation_price:
+                    type: number
+                  margin_of_safety:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/bridge-verify:
+    post:
+      operationId: defiBridgeVerify
+      summary: Bridge Proof (BRP-100-BridgeIntegrity)
+      description: Verify cross-chain bridge transaction integrity. Costs $0.08/verification.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - bridge_id
+              - source_chain
+              - dest_chain
+              - amount
+              - token
+              properties:
+                bridge_id:
+                  type: string
+                source_chain:
+                  type: string
+                dest_chain:
+                  type: string
+                amount:
+                  type: number
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Bridge verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bridge_valid:
+                    type: boolean
+                  source_confirmed:
+                    type: boolean
+                  dest_confirmed:
+                    type: boolean
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/contract-audit:
+    post:
+      operationId: defiContractAudit
+      summary: Contract Verify (CVR-100-AuditBound)
+      description: Automated smart contract security audit. Costs $0.15/audit.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - contract_id
+              - contract_type
+              properties:
+                contract_id:
+                  type: string
+                contract_type:
+                  type: string
+                  example: erc20
+      responses:
+        '200':
+          description: Audit result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contract_id:
+                    type: string
+                  audit_passed:
+                    type: boolean
+                  vulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                  risk_score:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/defi/yield-optimize:
+    post:
+      operationId: defiYieldOptimize
+      summary: Yield Oracle (YLD-100-YieldConvergence)
+      description: 'Optimize yield strategy across DeFi protocols. Fee: $0.04 + 2% of alpha.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - principal_usd
+              - risk_tolerance
+              properties:
+                principal_usd:
+                  type: number
+                  example: 10000
+                risk_tolerance:
+                  type: number
+                  format: float
+                  example: 0.5
+      responses:
+        '200':
+          description: Yield optimization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  strategy:
+                    type: object
+                  expected_apr:
+                    type: number
+                    format: float
+                  risk_adjusted_return:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/vrf/draw:
+    post:
+      operationId: vrfDraw
+      summary: VRF Gaming draw (VRF-100)
+      description: 'Verifiable random function draw for gaming applications. Fee: $0.01 + 0.5% of pot_value_usd.'
+      tags:
+      - VRF
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - game_id
+              - round
+              - range_max
+              - pot_value_usd
+              properties:
+                game_id:
+                  type: string
+                round:
+                  type: integer
+                range_max:
+                  type: integer
+                pot_value_usd:
+                  type: number
+      responses:
+        '200':
+          description: VRF draw result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  draw_id:
+                    type: string
+                  value:
+                    type: integer
+                  proof:
+                    type: string
+                  verified:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/vrf/verify-draw:
+    post:
+      operationId: vrfVerifyDraw
+      summary: VRF Verify draw (VRF-101)
+      description: Verify a previous VRF draw. Included with draw fee.
+      tags:
+      - VRF
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - draw_id
+              - expected_value
+              properties:
+                draw_id:
+                  type: string
+                expected_value:
+                  type: integer
+      responses:
+        '200':
+          description: VRF verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  draw_id:
+                    type: string
+                  valid:
+                    type: boolean
+                  expected_value:
+                    type: integer
+                  actual_value:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/sla/register:
+    post:
+      operationId: registerSla
+      summary: Register an SLA
+      description: Register a service level agreement between agents. Costs $0.08/call.
+      tags:
+      - SLA
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - provider_id
+              - consumer_id
+              - terms
+              properties:
+                provider_id:
+                  type: string
+                consumer_id:
+                  type: string
+                terms:
+                  type: object
+      responses:
+        '200':
+          description: SLA registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sla_id:
+                    type: string
+                  status:
+                    type: string
+                  registered_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/sla/report:
+    post:
+      operationId: reportSlaViolation
+      summary: Report SLA violation
+      description: Report an SLA violation. Costs $0.02/call.
+      tags:
+      - SLA
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sla_id
+              - violation_type
+              properties:
+                sla_id:
+                  type: string
+                violation_type:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Violation reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  sla_id:
+                    type: string
+                  status:
+                    type: string
+                  reported_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/sla/status:
+    get:
+      operationId: getSlaStatus
+      summary: SLA status check
+      description: Check the status of an SLA. Costs $0.008/call.
+      tags:
+      - SLA
+      parameters:
+      - name: sla_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: SLA identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: SLA status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sla_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - violated
+                    - expired
+                  violations:
+                    type: integer
+                  uptime_percent:
+                    type: number
+                    format: float
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/escrow/create:
+    post:
+      operationId: createEscrow
+      summary: Create agent-to-agent escrow
+      description: Create an escrow between two agents. Costs $0.04/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - payer_id
+              - payee_id
+              - amount
+              - currency
+              properties:
+                payer_id:
+                  type: string
+                payee_id:
+                  type: string
+                amount:
+                  type: number
+                currency:
+                  type: string
+                conditions:
+                  type: object
+      responses:
+        '200':
+          description: Escrow created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/escrow/release:
+    post:
+      operationId: releaseEscrow
+      summary: Release escrowed funds
+      description: Release escrowed funds to the payee. Costs $0.02/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - escrow_id
+              properties:
+                escrow_id:
+                  type: string
+      responses:
+        '200':
+          description: Escrow released
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    example: released
+                  released_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/escrow/dispute:
+    post:
+      operationId: disputeEscrow
+      summary: Open escrow dispute
+      description: Open a dispute on an escrow. Costs $0.06/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - escrow_id
+              - reason
+              properties:
+                escrow_id:
+                  type: string
+                reason:
+                  type: string
+                evidence:
+                  type: object
+      responses:
+        '200':
+          description: Dispute opened
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dispute_id:
+                    type: string
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    example: open
+                  opened_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/escrow/status:
+    get:
+      operationId: getEscrowStatus
+      summary: Escrow status
+      description: Check the status of an escrow. Costs $0.008/call.
+      tags:
+      - Escrow
+      parameters:
+      - name: escrow_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Escrow identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Escrow status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - released
+                    - disputed
+                    - refunded
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/reputation/record:
+    post:
+      operationId: recordReputation
+      summary: Record agent interaction
+      description: Record an agent interaction in the reputation ledger. Costs $0.02/call.
+      tags:
+      - Reputation
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - interaction_type
+              - outcome
+              properties:
+                agent_id:
+                  type: string
+                interaction_type:
+                  type: string
+                outcome:
+                  type: string
+                  enum:
+                  - positive
+                  - negative
+                  - neutral
+                counterparty_id:
+                  type: string
+      responses:
+        '200':
+          description: Interaction recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record_id:
+                    type: string
+                  agent_id:
+                    type: string
+                  recorded_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/reputation/score:
+    get:
+      operationId: getReputationScore
+      summary: Get reputation score
+      description: Get the reputation score for an agent. Costs $0.008/call.
+      tags:
+      - Reputation
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Reputation score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  score:
+                    type: number
+                    format: float
+                  total_interactions:
+                    type: integer
+                  positive_ratio:
+                    type: number
+                    format: float
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/reputation/history:
+    get:
+      operationId: getReputationHistory
+      summary: Reputation history
+      description: Get the reputation history for an agent.
+      tags:
+      - Reputation
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Reputation history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        interaction_type:
+                          type: string
+                        outcome:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/shield/session:
+    post:
+      operationId: shieldSession
+      summary: Initialize Shield session
+      description: Initialize an AAAA Shield session for post-quantum secure communication.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                algorithm:
+                  type: string
+                  example: kyber-1024
+      responses:
+        '200':
+          description: Shield session initialized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  public_key:
+                    type: string
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/shield/post-quantum:
+    post:
+      operationId: shieldPostQuantum
+      summary: Post-quantum key exchange
+      description: Perform a post-quantum key exchange using Kyber or similar lattice-based algorithms.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              - public_key
+              properties:
+                session_id:
+                  type: string
+                public_key:
+                  type: string
+      responses:
+        '200':
+          description: Key exchange result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  shared_secret_hash:
+                    type: string
+                  algorithm:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/shield/verify:
+    post:
+      operationId: shieldVerify
+      summary: Verify Shield session
+      description: Verify the integrity of an AAAA Shield session.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Shield verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  valid:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/shield/rotate:
+    post:
+      operationId: shieldRotate
+      summary: Rotate Shield keys
+      description: Rotate the cryptographic keys for an AAAA Shield session.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Keys rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  new_public_key:
+                    type: string
+                  rotated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/shield/status:
+    get:
+      operationId: getShieldStatus
+      summary: Shield status
+      description: Get the status of an AAAA Shield session.
+      tags:
+      - Shield
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Shield session ID
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Shield status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - expired
+                    - revoked
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  last_rotated:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/delegation/validate:
+    post:
+      operationId: validateDelegation
+      summary: Validate UCAN delegation chain
+      description: Validate a UCAN delegation chain for correctness and authorization.
+      tags:
+      - Delegation
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              properties:
+                token:
+                  type: string
+                  description: UCAN token to validate
+      responses:
+        '200':
+          description: Delegation validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  chain_depth:
+                    type: integer
+                  issuer:
+                    type: string
+                  audience:
+                    type: string
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/delegation/chain:
+    get:
+      operationId: getDelegationChain
+      summary: Get delegation chain
+      description: Get the full delegation chain for an agent.
+      tags:
+      - Delegation
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Delegation chain
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  chain:
+                    type: array
+                    items:
+                      type: object
+                  depth:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/delegation/revoke:
+    post:
+      operationId: revokeDelegation
+      summary: Revoke delegation
+      description: Revoke a delegation, invalidating the entire sub-chain.
+      tags:
+      - Delegation
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Delegation revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revoked:
+                    type: boolean
+                  revoked_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/delegation/list:
+    get:
+      operationId: listDelegations
+      summary: List delegations
+      description: List all delegations for an agent.
+      tags:
+      - Delegation
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Delegations list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  delegations:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/delegation/depth:
+    get:
+      operationId: getDelegationDepth
+      summary: Get delegation depth
+      description: Get the delegation depth for an agent.
+      tags:
+      - Delegation
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Delegation depth
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  depth:
+                    type: integer
+                  max_allowed:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ucan/create:
+    post:
+      operationId: createUcan
+      summary: Create UCAN token
+      description: Create a new UCAN token with specified capabilities.
+      tags:
+      - UCAN
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - issuer
+              - audience
+              - capabilities
+              properties:
+                issuer:
+                  type: string
+                audience:
+                  type: string
+                capabilities:
+                  type: array
+                  items:
+                    type: object
+                expiration:
+                  type: integer
+                  description: Unix timestamp
+      responses:
+        '200':
+          description: UCAN token created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  issuer:
+                    type: string
+                  audience:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ucan/verify:
+    post:
+      operationId: verifyUcan
+      summary: Verify UCAN token
+      description: Verify a UCAN token and its delegation chain.
+      tags:
+      - UCAN
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: UCAN verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  issuer:
+                    type: string
+                  audience:
+                    type: string
+                  capabilities:
+                    type: array
+                    items:
+                      type: object
+                  expired:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ucan/revoke:
+    post:
+      operationId: revokeUcan
+      summary: Revoke UCAN token
+      description: Revoke a UCAN token.
+      tags:
+      - UCAN
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - token
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: UCAN revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revoked:
+                    type: boolean
+                  revoked_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/ucan/delegate:
+    post:
+      operationId: delegateUcan
+      summary: Create delegated UCAN
+      description: Create a delegated UCAN token from an existing token, narrowing capabilities.
+      tags:
+      - UCAN
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - parent_token
+              - audience
+              - capabilities
+              properties:
+                parent_token:
+                  type: string
+                audience:
+                  type: string
+                capabilities:
+                  type: array
+                  items:
+                    type: object
+                expiration:
+                  type: integer
+      responses:
+        '200':
+          description: Delegated UCAN created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  parent_issuer:
+                    type: string
+                  audience:
+                    type: string
+                  depth:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/keys/generate:
+    post:
+      operationId: generateKeys
+      summary: Generate cryptographic key pair
+      description: Generate a new cryptographic key pair for agent identity or encryption.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                algorithm:
+                  type: string
+                  example: ed25519
+                label:
+                  type: string
+      responses:
+        '200':
+          description: Key pair generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key_id:
+                    type: string
+                  public_key:
+                    type: string
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/keys/rotate:
+    post:
+      operationId: rotateKeys
+      summary: Rotate keys
+      description: Rotate an existing key pair, generating a new key and deprecating the old one.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - key_id
+              properties:
+                key_id:
+                  type: string
+      responses:
+        '200':
+          description: Keys rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  old_key_id:
+                    type: string
+                  new_key_id:
+                    type: string
+                  new_public_key:
+                    type: string
+                  rotated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/keys/revoke:
+    post:
+      operationId: revokeKeys
+      summary: Revoke keys
+      description: Revoke a key pair, marking it as permanently unusable.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - key_id
+              properties:
+                key_id:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Keys revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key_id:
+                    type: string
+                  revoked:
+                    type: boolean
+                  revoked_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/security/zero-day:
+    post:
+      operationId: zeroDayAssessment
+      summary: Zero-day threat assessment
+      description: Perform a zero-day threat assessment. Costs $0.04/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target
+              properties:
+                target:
+                  type: string
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Zero-day assessment result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  vulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/credits/balance:
+    get:
+      operationId: getCreditBalance
+      summary: Check credit balance
+      description: Check the remaining credit balance for the API key.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Credit balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                  currency:
+                    type: string
+                    example: USD
+                  last_charged:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/credits/history:
+    get:
+      operationId: getCreditHistory
+      summary: Credit usage history
+      description: Retrieve credit usage history for the API key.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Credit history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        endpoint:
+                          type: string
+                        amount:
+                          type: number
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/credits/usage:
+    get:
+      operationId: getCreditUsage
+      summary: Detailed usage breakdown
+      description: Get a detailed breakdown of credit usage by endpoint and time period.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Usage breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: string
+                  total_spent:
+                    type: number
+                  by_endpoint:
+                    type: object
+                  by_day:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/audit/log:
+    post:
+      operationId: logAuditEvent
+      summary: Log audit event
+      description: Log an audit event. Costs $0.02/event.
+      tags:
+      - Audit
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event_type
+              - details
+              properties:
+                event_type:
+                  type: string
+                actor:
+                  type: string
+                details:
+                  type: object
+      responses:
+        '200':
+          description: Audit event logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: string
+                  logged_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/audit/trail:
+    get:
+      operationId: getAuditTrail
+      summary: Retrieve audit trail
+      description: Retrieve the audit trail. Costs $0.02/query.
+      tags:
+      - Audit
+      parameters:
+      - name: actor
+        in: query
+        schema:
+          type: string
+        description: Filter by actor
+      - name: event_type
+        in: query
+        schema:
+          type: string
+        description: Filter by event type
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Audit trail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        event_id:
+                          type: string
+                        event_type:
+                          type: string
+                        actor:
+                          type: string
+                        details:
+                          type: object
+                        timestamp:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /v1/audit/export:
+    get:
+      operationId: exportAuditLog
+      summary: Export audit log
+      description: Export the full audit log. Costs $0.08/export.
+      tags:
+      - Audit
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Audit log export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  export_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  exported_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+  /mcp:
+    post:
+      operationId: mcpEndpoint
+      summary: MCP server endpoint
+      description: 'Model Context Protocol (MCP) endpoint. Available tools: health, metrics, oracle_entropy, oracle_hallucination, ratchetgate_session, ratchetgate_register, ratchetgate_advance, inference, inference_stream.'
+      tags:
+      - Protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: MCP response
+          content:
+            application/json:
+              schema:
+                type: object
+  /a2a:
+    post:
+      operationId: a2aEndpoint
+      summary: A2A agent-to-agent endpoint
+      description: 'Google Agent-to-Agent (A2A) protocol endpoint. Supports methods: message/send, tasks/get.'
+      tags:
+      - Protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - jsonrpc
+              - method
+              - id
+              properties:
+                jsonrpc:
+                  type: string
+                  enum:
+                  - '2.0'
+                method:
+                  type: string
+                  enum:
+                  - message/send
+                  - tasks/get
+                params:
+                  type: object
+                id:
+                  type: string
+            example:
+              jsonrpc: '2.0'
+              method: message/send
+              params:
+                message:
+                  role: user
+                  parts:
+                  - type: text
+                    text: Check health
+              id: '1'
+      responses:
+        '200':
+          description: A2A JSON-RPC response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                  result:
+                    type: object
+                  id:
+                    type: string

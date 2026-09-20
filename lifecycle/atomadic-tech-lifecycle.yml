@@ -1,0 +1,59 @@
+generated: '2026-09-19'
+method: searched
+source: https://atomadic.tech/changelog + https://atomadic.tech/status + https://atomadic.tech/api-status + https://atomadic.tech/legal + openapi/atomadic-tech-openapi.yml + PyPI release history
+versioning:
+  scheme: path-prefix (/v1) + info.version semver
+  current:
+    openapi_info_version: 0.5.1
+    live_health_version: 0.5.0 (GET /health, build 2026-04-08)
+    live_metrics_version: '0.5.0 (GET /v1/metrics, "endpoints": 119)'
+    mcp_server_version: 0.6.9 (mcp.atomadic.tech initialize; built 2026-08-02)
+    agent_card_version: 0.5.1
+  notes: >-
+    Every REST path sits under /v1 except the discovery documents, /health, /mcp and /a2a. The spec
+    says 0.5.1 while the running service reports 0.5.0 — a minor drift. No v2 path exists.
+changelog:
+  url: https://atomadic.tech/changelog
+  artifact: changelog/atomadic-tech-changelog.yml
+  dated: true
+  latest_entry: v0.5.0 — 2026-04-09
+  notes: Two dated entries (v0.5.0, v0.4.0), server-rendered HTML, readable without JavaScript. See changelog/ for the structured entries.
+status_page:
+  url: https://atomadic.tech/status
+  provider: self-hosted HTML (not Atlassian/Better Stack/Instatus)
+  machine_readable_api: partial
+  machine_readable_note: >-
+    /status is a hand-written HTML table of every endpoint with price, latency target and an
+    "Operational" badge ("Updated live • 99.9% uptime"); no incident history and no JSON summary.
+    /api-status (linked from the footer) IS JSON but describes the MCP catalog health
+    (ok, service, version, tools_in_catalog, revenue_ready), not per-endpoint status.
+  probed:
+  - {url: https://atomadic.tech/status, status: 200, content_type: text/html, checked: '2026-09-19'}
+  - {url: https://atomadic.tech/api-status, status: 200, content_type: application/json, checked: '2026-09-19'}
+  - {url: https://atomadic.tech/health, status: 200, content_type: application/json, checked: '2026-09-19'}
+sla:
+  published: true
+  uptime_target: 99.9%
+  source: 'https://atomadic.tech/status ("Updated live • 99.9% uptime") and GET /v1/metrics ("uptime_target": "99.9%")'
+  contractual: false
+  note: A target stated on the status page and in a metrics endpoint, not a contractual SLA with credits; the legal page carries no SLA clause. Enterprise compliance tier advertises "4h response SLA" for support only.
+deprecation:
+  policy_documented: false
+  policy_url: null
+  sunset_header: false
+  deprecated_operations: []
+  notes: >-
+    No deprecation or sunset policy anywhere on the site or in the legal terms; the single
+    "deprecat" match in the spec is prose in a description, not a `deprecated: true` flag. The
+    changelog records one feature being put "on hold" (HELIX compression, v0.5.0) while the
+    operations (compressData, getHelixManifest) remain in the contract and are still priced. No
+    Deprecation pointer is emitted.
+observed_change_cadence:
+  rest_api: v0.4.0 (2026-03-20) -> v0.5.0 (2026-04-09); no changelog entry since, five months before this capture
+  python_sdk: 18 PyPI releases, last 0.3.6 on 2026-06-21
+  mcp_server: 0.6.9 built 2026-08-02
+  state_of_truth: published_at 2026-06-21
+  reading: The REST contract has been static since April while the MCP/entitlement product kept shipping through August — the centre of gravity moved from the x402 REST API to the entitlement-gated MCP.
+support:
+  contacts: [atomadic69@gmail.com (legal, security.txt, quickstart), support@atomadic.tech (SDK, docs), billing@atomadic.tech (pricing), dev@atomadic.tech (PyPI aaaa-nexus-mcp)]
+  support_page: null

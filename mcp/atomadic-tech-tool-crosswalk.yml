@@ -1,0 +1,1037 @@
+generated: '2026-09-19'
+method: derived
+source: Live tools/list on https://atomadic.tech/mcp (44 tools), https://mcp.atomadic.tech (68 tools) and https://nexus.atomadic.tech/mcp
+  (25 tools) on 2026-09-19, bound to openapi/atomadic-tech-openapi.yml (149 operations). The atomadic.tech/mcp bindings come
+  from the provider's own /.well-known/mcp.json, which declares tools[].endpoint + method; the other two hosts publish no
+  endpoint map so their rows are name-derived.
+surfaces:
+  openapi:
+    file: openapi/atomadic-tech-openapi.yml
+    remote: https://atomadic.tech/openapi.json
+    operations: 149
+    gated: false
+  mcp:
+  - url: https://atomadic.tech/mcp
+    server: aaaa-nexus
+    tools: 44
+    tools_list_gated: false
+    tools_call: free tools open; paid tools need X-API-Key or x402 payment
+    evidence: mcp/atomadic-tech-nexus-mcp-tools-list.json
+  - url: https://mcp.atomadic.tech
+    server: atomadic-mcp 0.6.9
+    tools: 68
+    tools_list_gated: false
+    tools_call: 'entitlement-gated (Authorization: Bearer ato_<key>); murmuration + two polyglot demos are free'
+    evidence: mcp/atomadic-tech-mcp-tools-list.json
+  - url: https://nexus.atomadic.tech/mcp
+    server: atomadic-nexus 0.1.0
+    tools: 25
+    tools_list_gated: false
+    evidence: mcp/atomadic-tech-nexus-host-mcp-tools-list.json
+  - url: https://fuse.atomadic.tech/mcp
+    server: atomadic-fuse 1.2.0
+    tools: null
+    tools_list_gated: true
+    evidence: 'HTTP 401 {"code":-32001,"message":"Unauthorized: API key required. Get yours at https://atomadic.tech/pay?sku=fuse-pro"}
+      on 2026-09-19; the host''s legacy agent.json lists 14 skills (a2a/atomadic-tech-fuse-agent-card.json).'
+  graphql: null
+crosswalk:
+- tool: rng_quantum
+  surface: https://atomadic.tech/mcp
+  category: rng
+  rest:
+  - getQuantumRng
+  binding: GET /v1/rng/quantum
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Free tool.
+- tool: threat_score
+  surface: https://atomadic.tech/mcp
+  category: threat
+  rest:
+  - scoreThreat
+  binding: POST /v1/threat/score
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 60000 micro-USDC/call.
+- tool: identity_verify
+  surface: https://atomadic.tech/mcp
+  category: identity
+  rest:
+  - verifyIdentity
+  binding: POST /v1/identity/verify
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 80000 micro-USDC/call.
+- tool: ratchet_register
+  surface: https://atomadic.tech/mcp
+  category: ratchet
+  rest:
+  - ratchetRegisterSession
+  binding: POST /v1/ratchet/register
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 20000 micro-USDC/call.
+- tool: rag_augment
+  surface: https://atomadic.tech/mcp
+  category: rag
+  rest:
+  - postTrustedRagAugment
+  binding: POST /v1/rag/augment
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 40000 micro-USDC/call.
+- tool: text_summarize
+  surface: https://atomadic.tech/mcp
+  category: text
+  rest:
+  - summarizeText
+  binding: POST /v1/text/summarize
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 40000 micro-USDC/call.
+- tool: intent_classify
+  surface: https://atomadic.tech/mcp
+  category: intent
+  rest:
+  - classifyAgentIntent
+  binding: POST /v1/agents/intent-classify
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 20000 micro-USDC/call.
+- tool: agents_plan
+  surface: https://atomadic.tech/mcp
+  category: agents
+  rest:
+  - planAgentGoal
+  binding: POST /v1/agents/plan
+  confidence: high
+  note: Binding declared by the provider in /.well-known/mcp.json (tools[].endpoint + method) and the path exists in the OpenAPI.
+    Priced 60000 micro-USDC/call.
+- tool: agents_contradiction
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - detectContradiction
+  binding: name-derived -> /v1/agents/contradiction
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_intent_classify
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - classifyAgentIntent
+  binding: name-derived -> /v1/agents/intent-classify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_plan
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - planAgentGoal
+  binding: name-derived -> /v1/agents/plan
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_register
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - registerAgent
+  binding: name-derived -> /v1/agents/register
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_reputation
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - getAgentReputation
+  binding: name-derived -> /v1/agents/reputation
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_semantic_diff
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - semanticDiff
+  binding: name-derived -> /v1/agents/semantic-diff
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: agents_topology
+  surface: https://mcp.atomadic.tech
+  category: agents
+  rest:
+  - getSwarmTopology
+  binding: name-derived -> /v1/agents/topology
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_check
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - checkCompliance
+  binding: name-derived -> /v1/compliance/check
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_eu_ai_act
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - euAiActCertificate
+  binding: name-derived -> /v1/compliance/eu-ai-act
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_explain
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - explainabilityCertificate
+  binding: name-derived -> /v1/compliance/explain
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_fairness
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - fairnessProof
+  binding: name-derived -> /v1/compliance/fairness
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_incident
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - reportIncident
+  binding: name-derived -> /v1/compliance/incident
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_incidents
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - getIncidents
+  binding: name-derived -> /v1/compliance/incidents
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_lineage
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - dataLineage
+  binding: name-derived -> /v1/compliance/lineage
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_oversight
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - logOversight
+  binding: name-derived -> /v1/compliance/oversight
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_oversight_history
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - getOversightHistory
+  binding: name-derived -> /v1/compliance/oversight/history
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: compliance_transparency
+  surface: https://mcp.atomadic.tech
+  category: compliance
+  rest:
+  - transparencyReport
+  binding: name-derived -> /v1/compliance/transparency
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_bridge_verify
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiBridgeVerify
+  binding: name-derived -> /v1/defi/bridge-verify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_contract_audit
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiContractAudit
+  binding: name-derived -> /v1/defi/contract-audit
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_liquidation_check
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiLiquidationCheck
+  binding: name-derived -> /v1/defi/liquidation-check
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_optimize
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiOptimize
+  binding: name-derived -> /v1/defi/optimize
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_oracle_verify
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiOracleVerify
+  binding: name-derived -> /v1/defi/oracle-verify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_risk_score
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiRiskScore
+  binding: name-derived -> /v1/defi/risk-score
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: defi_yield_optimize
+  surface: https://mcp.atomadic.tech
+  category: defi
+  rest:
+  - defiYieldOptimize
+  binding: name-derived -> /v1/defi/yield-optimize
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: drift_certificate
+  surface: https://mcp.atomadic.tech
+  category: drift
+  rest:
+  - getDriftCertificate
+  binding: name-derived -> /v1/drift/certificate
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: drift_check
+  surface: https://mcp.atomadic.tech
+  category: drift
+  rest: &id001
+  - driftCheck
+  binding: name-derived -> /v1/drift/check
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: escrow_create
+  surface: https://mcp.atomadic.tech
+  category: escrow
+  rest:
+  - createEscrow
+  binding: name-derived -> /v1/escrow/create
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: escrow_dispute
+  surface: https://mcp.atomadic.tech
+  category: escrow
+  rest:
+  - disputeEscrow
+  binding: name-derived -> /v1/escrow/dispute
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: escrow_release
+  surface: https://mcp.atomadic.tech
+  category: escrow
+  rest:
+  - releaseEscrow
+  binding: name-derived -> /v1/escrow/release
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: forge_badge_{model}
+  surface: https://mcp.atomadic.tech
+  category: forge
+  rest:
+  - getForgeBadge
+  binding: name-derived -> /v1/forge/badge/{model}
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: forge_delta_submit
+  surface: https://mcp.atomadic.tech
+  category: forge
+  rest:
+  - submitForgeDelta
+  binding: name-derived -> /v1/forge/delta/submit
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: forge_leaderboard
+  surface: https://mcp.atomadic.tech
+  category: forge
+  rest:
+  - getForgeLeaderboard
+  binding: name-derived -> /v1/forge/leaderboard
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: forge_quarantine
+  surface: https://mcp.atomadic.tech
+  category: forge
+  rest:
+  - getForgeQuarantine
+  binding: name-derived -> /v1/forge/quarantine
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: forge_verify
+  surface: https://mcp.atomadic.tech
+  category: forge
+  rest:
+  - verifyForgeModel
+  binding: name-derived -> /v1/forge/verify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: identity_sybil_check
+  surface: https://mcp.atomadic.tech
+  category: identity
+  rest:
+  - sybilCheck
+  binding: name-derived -> /v1/identity/sybil-check
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: identity_verify
+  surface: https://mcp.atomadic.tech
+  category: identity
+  rest:
+  - verifyIdentity
+  binding: name-derived -> /v1/identity/verify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: inference
+  surface: https://mcp.atomadic.tech
+  category: inference
+  rest:
+  - chatInference
+  binding: name-derived -> /v1/inference
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: inference_stream
+  surface: https://mcp.atomadic.tech
+  category: inference
+  rest:
+  - streamInference
+  binding: name-derived -> /v1/inference/stream
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: oracle_entropy
+  surface: https://mcp.atomadic.tech
+  category: oracle
+  rest:
+  - getEntropyEpoch
+  binding: name-derived -> /v1/oracle/entropy
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: oracle_hallucination
+  surface: https://mcp.atomadic.tech
+  category: oracle
+  rest:
+  - detectHallucination
+  binding: name-derived -> /v1/oracle/hallucination
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: rag_augment
+  surface: https://mcp.atomadic.tech
+  category: rag
+  rest:
+  - postTrustedRagAugment
+  binding: name-derived -> /v1/rag/augment
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: ratchet_advance
+  surface: https://mcp.atomadic.tech
+  category: ratchet
+  rest:
+  - ratchetAdvanceSession
+  binding: name-derived -> /v1/ratchet/advance
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: ratchet_probe
+  surface: https://mcp.atomadic.tech
+  category: ratchet
+  rest:
+  - ratchetProbe
+  binding: name-derived -> /v1/ratchet/probe
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: ratchet_register
+  surface: https://mcp.atomadic.tech
+  category: ratchet
+  rest:
+  - ratchetRegisterSession
+  binding: name-derived -> /v1/ratchet/register
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: reputation_record
+  surface: https://mcp.atomadic.tech
+  category: reputation
+  rest:
+  - recordReputation
+  binding: name-derived -> /v1/reputation/record
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: rng_quantum
+  surface: https://mcp.atomadic.tech
+  category: rng
+  rest:
+  - getQuantumRng
+  binding: name-derived -> /v1/rng/quantum
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: rng_verify
+  surface: https://mcp.atomadic.tech
+  category: rng
+  rest:
+  - verifyRng
+  binding: name-derived -> /v1/rng/verify
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: security_zero_day
+  surface: https://mcp.atomadic.tech
+  category: security
+  rest:
+  - zeroDayAssessment
+  binding: name-derived -> /v1/security/zero-day
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: sla_register
+  surface: https://mcp.atomadic.tech
+  category: sla
+  rest:
+  - registerSla
+  binding: name-derived -> /v1/sla/register
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: sla_report
+  surface: https://mcp.atomadic.tech
+  category: sla
+  rest:
+  - reportSlaViolation
+  binding: name-derived -> /v1/sla/report
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: swarm_inbox
+  surface: https://mcp.atomadic.tech
+  category: swarm
+  rest:
+  - pollSwarmInbox
+  binding: name-derived -> /v1/swarm/inbox
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: swarm_relay
+  surface: https://mcp.atomadic.tech
+  category: swarm
+  rest:
+  - swarmRelay
+  binding: name-derived -> /v1/swarm/relay
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: text_keywords
+  surface: https://mcp.atomadic.tech
+  category: text
+  rest:
+  - textKeywords
+  binding: name-derived -> /v1/text/keywords
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: text_sentiment
+  surface: https://mcp.atomadic.tech
+  category: text
+  rest:
+  - analyzeSentiment
+  binding: name-derived -> /v1/text/sentiment
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: text_summarize
+  surface: https://mcp.atomadic.tech
+  category: text
+  rest:
+  - summarizeText
+  binding: name-derived -> /v1/text/summarize
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: threat_score
+  surface: https://mcp.atomadic.tech
+  category: threat
+  rest:
+  - scoreThreat
+  binding: name-derived -> /v1/threat/score
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: trust_decay
+  surface: https://mcp.atomadic.tech
+  category: trust
+  rest:
+  - getTrustDecay
+  binding: name-derived -> /v1/trust/decay
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: trust_history
+  surface: https://mcp.atomadic.tech
+  category: trust
+  rest:
+  - getTrustHistory
+  binding: name-derived -> /v1/trust/history
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: trust_score
+  surface: https://mcp.atomadic.tech
+  category: trust
+  rest: &id002
+  - getTrustScore
+  binding: name-derived -> /v1/trust/score
+  confidence: medium
+  note: mcp.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The live
+    inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: drift_check
+  surface: https://nexus.atomadic.tech/mcp
+  category: drift
+  rest: *id001
+  binding: name-derived -> /v1/drift/check
+  confidence: medium
+  note: nexus.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The
+    live inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+- tool: trust_score
+  surface: https://nexus.atomadic.tech/mcp
+  category: trust
+  rest: *id002
+  binding: name-derived -> /v1/trust/score
+  confidence: medium
+  note: nexus.atomadic.tech publishes no endpoint map; bound by tool name to the OpenAPI path with the same segments. The
+    live inputSchema was captured in mcp/ and should be compared to the operation requestBody before relying on the binding.
+mcp_only:
+- tool: hallucination_oracle
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint GET /v1/oracle/hallucination in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: authorize_action
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/authorize/action in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: spending_authorize
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/spending/authorize in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: lineage_record
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/lineage/record in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: contract_verify
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/contract/verify in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: federation_mint
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/federation/mint in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: aegis_mcp_proxy_execute
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/aegis/mcp-proxy/execute in /.well-known/mcp.json but that path is not in the
+    149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the
+    contract).
+- tool: aegis_router_epistemic_bound
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/aegis/router/epistemic-bound in /.well-known/mcp.json but that path is not in
+    the 149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in
+    the contract).
+- tool: vanguard_continuous_redteam
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/vanguard/continuous-redteam in /.well-known/mcp.json but that path is not in
+    the 149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in
+    the contract).
+- tool: vanguard_mev_route_intent
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/vanguard/mev/route-intent in /.well-known/mcp.json but that path is not in the
+    149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the
+    contract).
+- tool: vanguard_wallet_govern_session
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/vanguard/wallet/govern-session in /.well-known/mcp.json but that path is not
+    in the 149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented
+    in the contract).
+- tool: vanguard_escrow_lock_and_verify
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/vanguard/escrow/lock-and-verify in /.well-known/mcp.json but that path is not
+    in the 149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented
+    in the contract).
+- tool: uep_preflight
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/preflight in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: uep_context
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/context in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: uep_synthesis_guard
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/synthesis-guard in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: uep_autopoiesis_plan
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/autopoiesis-plan in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: uep_trace_certify
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/trace-certify in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: uep_aha_detect
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/uep/aha-detect in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: sys_constants
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint GET /v1/sys/constants in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: sys_trust_gate
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/sys/trust_gate in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: sys_lint_gate
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/sys/lint_gate in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: keys_validate
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/keys/validate in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: entitlement_attest
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/entitlement/attest in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: omega_intent_route
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/omega/intent/route in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: omega_emit_materialize
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/omega/emit/materialize in /.well-known/mcp.json but that path is not in the
+    149-operation OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the
+    contract).
+- tool: omega_emit_polyglot
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/omega/emit/polyglot in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: omega_intent_nl
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/omega/intent/nl in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: forge_recon
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/forge/recon in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: forge_certify
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/forge/certify in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: forge_wire
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/forge/wire in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: forge_tier_infer
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/forge/tier-infer in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: forge_audit
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/forge/audit in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: docs_generate
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/docs/generate in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: lint_analyze
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/lint/analyze in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: certify_codebase
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/certify/codebase in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: certify_output
+  surface: https://atomadic.tech/mcp
+  reason: Provider declares endpoint POST /v1/certify/output in /.well-known/mcp.json but that path is not in the 149-operation
+    OpenAPI (the AEGIS/VANGUARD/UEP/Omega/Forge surfaces are priced in pricing.json yet undocumented in the contract).
+- tool: murmuration
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: audit_work_claim
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: verify_settlement
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: receipt_reputation
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: detect_contradiction
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: enforce_sla
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: route_capability
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: render_polyglot_roundtrip_pure
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: render_polyglot_all_pure
+  surface: https://mcp.atomadic.tech
+  reason: No OpenAPI path matches the tool name on mcp.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: trust_gate
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: verirand
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: hallucination_oracle
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: x402_verify
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: attest_lineage
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: agent_reputation
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: ratchet_gate
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: nexus_shield
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: prompt_inject_scan
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: goal_alignment_check
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: semantic_diff
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: contradiction_detect
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: tool_misuse_detect
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: routing_recommend
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: pricing_lookup
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: sla_engine
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: topological_identity
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: recall_lineage
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: sign_x402
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: consensus_create
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: escrow_open
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: stripe_link
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+- tool: lora_capture_fix
+  surface: https://nexus.atomadic.tech/mcp
+  reason: No OpenAPI path matches the tool name on nexus.atomadic.tech; tool is MCP-only (Fuse/Forge/Omega/onboarding surfaces
+    are not in the REST contract).
+rest_only:
+- operationId: a2aEndpoint
+- operationId: analyzeThreat
+- operationId: batchRng
+- operationId: blockThreat
+- operationId: challengeIdentity
+- operationId: compressData
+- operationId: createStripeSession
+- operationId: createUcan
+- operationId: delegateTask
+- operationId: delegateUcan
+- operationId: deregisterAgent
+- operationId: discoverAgents
+- operationId: exportAuditLog
+- operationId: generateKeys
+- operationId: getAgentCapabilities
+- operationId: getAgentCard
+- operationId: getAgentCardAlt
+- operationId: getAgentHealth
+- operationId: getAgentStatus
+- operationId: getAiPluginManifest
+- operationId: getAuditTrail
+- operationId: getBitnetModels
+- operationId: getCreditBalance
+- operationId: getCreditHistory
+- operationId: getCreditUsage
+- operationId: getDelegationChain
+- operationId: getDelegationDepth
+- operationId: getEscrowStatus
+- operationId: getHealth
+- operationId: getHelixManifest
+- operationId: getMcpManifest
+- operationId: getMetrics
+- operationId: getOpenApiSpec
+- operationId: getPricingManifest
+- operationId: getReputationHistory
+- operationId: getReputationScore
+- operationId: getShieldStatus
+- operationId: getSlaStatus
+- operationId: getStripePrices
+- operationId: getSwarmPeers
+- operationId: getSwarmScopedTopology
+- operationId: getThreatHistory
+- operationId: inferenceClassify
+- operationId: inferenceEmbeddings
+- operationId: listDelegations
+- operationId: listInferenceModels
+- operationId: logAuditEvent
+- operationId: lookupIdentity
+- operationId: mcpEndpoint
+- operationId: messageAgent
+- operationId: negotiateAgents
+- operationId: postLoraBufferCapture
+- operationId: postLoraBufferInspect
+- operationId: ratchetList
+- operationId: ratchetRevoke
+- operationId: ratchetStatus
+- operationId: ratchetVerify
+- operationId: registerIdentity
+- operationId: reportThreat
+- operationId: revokeDelegation
+- operationId: revokeIdentity
+- operationId: revokeKeys
+- operationId: revokeUcan
+- operationId: rotateKeys
+- operationId: searchAgents
+- operationId: seededRng
+- operationId: shieldPostQuantum
+- operationId: shieldRotate
+- operationId: shieldSession
+- operationId: shieldVerify
+- operationId: streamRng
+- operationId: swarmBroadcast
+- operationId: swarmJoin
+- operationId: swarmLeave
+- operationId: textClassify
+- operationId: textDetectLanguage
+- operationId: textEmbed
+- operationId: textExtract
+- operationId: textNer
+- operationId: textRewrite
+- operationId: textSimilarity
+- operationId: textTokenize
+- operationId: textTranslate
+- operationId: updateAgent
+- operationId: validateDelegation
+- operationId: verifyPayment
+- operationId: verifyUcan
+- operationId: verirandBytes
+- operationId: vrfDraw
+- operationId: vrfVerifyDraw
+coverage:
+  tools_total: 137
+  tools_bound: 69
+  tools_mcp_only: 68
+  operations_total: 149
+  operations_bound: 59
+  operations_rest_only: 90
+  high_confidence_rows: 8
+  medium_confidence_rows: 61

@@ -1,0 +1,126 @@
+generated: '2026-09-19'
+method: probed
+source: https://atomadic.tech/.well-known/agent-card.json
+card:
+  file: a2a/atomadic-tech-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: atomadic.tech
+  also_served_at: /.well-known/agent.json (legacy path, byte-identical body)
+  note: >-
+    Served from the apex, the same host as the OpenAPI servers[] entry. provider.organization is
+    "Atomadic Tech" and provider.url is https://atomadic.tech, the card's url is
+    https://atomadic.tech/a2a and its documentationUrl is the provider's quickstart — ownership is not
+    in question. OWNERSHIP CAVEAT RECORDED: the first request of this session returned a DIFFERENT
+    company's card from this exact URL ("Claix", url https://www.claix.dev/a2a, 20 skills); ten
+    re-fetches over the following twenty minutes all returned the AAAA-Nexus card saved here. The
+    saved body was checked for self-identification before saving. Two sibling hosts serve their own
+    legacy-path cards (fuse.atomadic.tech and nexus.atomadic.tech, provider Atomadic Tech); they are
+    saved alongside and graded below but the apex card is the one this pointer asserts.
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://atomadic.tech/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  content_length: 13230
+  body_parses_as: JSON object with AgentCard shape (name, url, version, protocolVersion, capabilities, skills, provider, preferredTransport, defaultInputModes, defaultOutputModes)
+  response_headers_of_note:
+    x-price-micro-usdc: '20000'
+    x-request-id: req_dea2d95ab458f66bc503f9252d23a968
+    access-control-expose-headers: X-Atomadic-Tier, X-Atomadic-Model, X-Request-Id, X-Price-Micro-USDC
+  endpoint_probe:
+    url: https://atomadic.tech/a2a
+    method: GET
+    http_status: 402
+    note: The A2A endpoint the card names is itself x402-metered (8000 micro-USDC per the 402 body and pricing.json "/a2a"). Reachable, but paid.
+agent_card:
+  name: AAAA-Nexus
+  url: https://atomadic.tech/a2a
+  version: 0.5.1
+  protocol_version: 1.0.0
+  preferred_transport: JSONRPC
+  provider:
+    organization: Atomadic Tech
+    url: https://atomadic.tech
+  documentation_url: https://atomadic.tech/quickstart
+  capabilities:
+    streaming: false
+    push_notifications: false
+    state_transition_history: false
+    x402Payment: true
+    freeTrial: true
+    freeTrialCallsPerEndpointPerDay: 3
+  default_input_modes: [application/json]
+  default_output_modes: [application/json]
+  skill_count: 26
+  skills:
+  - {id: quantum-rng, name: Quantum RNG}
+  - {id: threat-score, name: Threat Scoring}
+  - {id: ratchetgate, name: RatchetGate Session Security}
+  - {id: ai-inference, name: AI Inference}
+  - {id: escrow, name: Agent Escrow}
+  - {id: reputation, name: Agent Reputation Oracle}
+  - {id: sla-enforcement, name: SLA Enforcement}
+  - {id: discovery, name: Agent Discovery & Matchmaking}
+  - {id: compliance, name: Compliance & Ethics}
+  - {id: identity, name: Identity & Delegation}
+  - {id: audit, name: Decision Audit Vault}
+  - {id: hallucination-oracle, name: Hallucination Oracle}
+  - {id: compression, name: HELIX Compression}
+  - {id: agent-reasoning, name: Agent Reasoning Tools}
+  - {id: swarm-relay, name: Swarm Relay}
+  - {id: zero-day-scanner, name: Zero-Day Scanner}
+  - {id: pre-action-auth, name: Pre-Action Authorization Gateway}
+  - {id: spending-governance, name: Spending Governance Oracle}
+  - {id: decision-lineage, name: Decision Lineage Vault}
+  - {id: behavioral-contract, name: Behavioral Contract Verifier}
+  - {id: identity-federation, name: Agent Identity Federation}
+  - {id: consensus-broker, name: Multi-Agent Consensus Broker}
+  - {id: quota-ledger, name: Hierarchical Quota Ledger}
+  - {id: output-certifier, name: Output Certification Notary}
+  - {id: rollback-coordinator, name: Agent Rollback Coordinator}
+  - {id: memory-fence, name: Cross-Tenant Memory Fence}
+grade_basis: >-
+  Graded against A2A 1.0.0 hard checks: capabilities is an OBJECT (pass), protocolVersion is present
+  and reads "1.0.0" (pass), skills is an ARRAY of 26 entries each with id/name/description/tags
+  (pass). The optional fields are all present too — preferredTransport JSONRPC, defaultInputModes
+  and defaultOutputModes each declared.
+deviations:
+- field: authentication / trialPolicy
+  observed: top-level non-spec members (authentication.schemes [Bearer, APIKey, x402], trialPolicy)
+  note: A2A 1.0.0 carries auth in securitySchemes/security; the card puts it in a custom `authentication` object and adds a `trialPolicy` object. Extra members are not a hard failure but a standard client will not read them.
+- field: capabilities
+  observed: x402Payment, freeTrial, freeTrialCallsPerEndpointPerDay alongside the spec members
+  note: Vendor extensions inside capabilities without an `extensions[]` declaration.
+- field: securitySchemes
+  observed: absent
+  note: No securitySchemes/security block despite the API requiring X-API-Key or an x402 proof on the endpoint the card names (GET /a2a answers 402).
+- field: url
+  observed: https://atomadic.tech/a2a answers 402 to an unpaid request
+  note: Reachable and correctly advertised, but every A2A message costs 8000 micro-USDC (~$0.008); the card does not say so and an A2A client with no wallet cannot complete a handshake.
+- field: description
+  observed: '"146+ endpoints"'
+  note: The published OpenAPI declares 149 operations, the live /v1/metrics says 119 endpoints, and the pricing manifest prices 89 paths of which 60 are absent from the contract. The number is marketing; the contract is the count.
+sibling_cards:
+- host: nexus.atomadic.tech
+  path: /.well-known/agent.json
+  file: a2a/atomadic-tech-nexus-agent-card.json
+  name: atomadic-nexus
+  version: 0.1.0
+  skills: 25
+  grade: flavored
+  why: capabilities uses snake_case members (push_notifications, state_transition_history) and there is NO protocolVersion — fails a hard check. Its 25 skills match the 25 tools served by tools/list on https://nexus.atomadic.tech/mcp.
+- host: fuse.atomadic.tech
+  path: /.well-known/agent.json
+  file: a2a/atomadic-tech-fuse-agent-card.json
+  name: atomadic-fuse
+  version: 1.2.0
+  skills: 14
+  grade: flavored
+  why: Same shape defects as the nexus card (snake_case capabilities, no protocolVersion); the host's /mcp answers 401 without a Fuse Pro key.
+conformance:
+  grade: conformant
+  spec: A2A 1.0.0
+  hard_checks: {capabilities_is_object: true, protocol_version_present: true, skills_is_array: true}
+  optional_checks: {preferred_transport: true, default_input_modes: true, default_output_modes: true}

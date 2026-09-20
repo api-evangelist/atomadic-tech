@@ -1,0 +1,190 @@
+generated: '2026-09-19'
+method: probed
+source: live probes of /.well-known/ on every Atomadic host on 2026-09-19 (apex, www, mcp.atomadic.tech, fuse.atomadic.tech, nexus.atomadic.tech, invest.atomadic.tech)
+summary: >-
+  The apex host is unusually rich: RFC 9116 security.txt, an A2A agent card at BOTH the canonical
+  /.well-known/agent-card.json and the legacy /.well-known/agent.json (byte-identical), an
+  ai-plugin.json, an MCP discovery manifest, a machine-readable x402 price manifest, and a document
+  at /.well-known/oauth-protected-resource. The MCP host (mcp.atomadic.tech) answers 405 to every
+  standard RFC 8414 / RFC 9728 path but serves four provider-specific documents (issuer public key,
+  Ed25519-signed closure receipt, state-of-truth, interlock). No OIDC discovery, no RFC 8414
+  authorization-server metadata and no /.well-known/api-catalog exist on any host.
+pointer_basis: >-
+  WellKnown pointer emitted on the strength of the seven 200s carrying real JSON/text documents on
+  atomadic.tech. SecurityTxt pointer emitted for the served RFC 9116 file (Contact, Expires
+  2027-01-01, Preferred-Languages, Canonical — no Policy line).
+rfc9728_note: >-
+  /.well-known/oauth-protected-resource returns 200 JSON but the body is NOT RFC 9728 shaped: it
+  carries `resource`, `scopes_supported` [api:read, api:write] and `bearer_methods_supported`
+  [header] (all RFC 9728 members) but NO `authorization_servers`, and adds provider-specific keys
+  (api_key_header X-API-Key, x402_payment, mcp_plugin, documentation). It is a hybrid
+  discovery document; conformance/ records it as partial. No authorization server exists to
+  discover — the API is API-key + x402, not OAuth.
+false_positive_watch: >-
+  invest.atomadic.tech answers HTTP 200 text/html (21,198 bytes, the same landing page) for EVERY
+  /.well-known/* path and for /openapi.json. Those 200s are recorded below as misses. Also: on the
+  very first request of the session the apex served ANOTHER TENANT's documents (an "Agent Health
+  Monitor API" OpenAPI, a "Claix" agent card and a "Cymetica / EventTrader" homepage) before settling
+  on Atomadic's own content on every subsequent fetch (10+ re-fetches over ~20 minutes, with and
+  without a browser UA). Every saved file below was re-fetched and checked for self-identification
+  (contact atomadic69@gmail.com / provider Atomadic Tech / resource atomadic.tech) before saving.
+hosts:
+- host: https://atomadic.tech
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain
+    file: atomadic-tech-security.txt
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    file: ../a2a/atomadic-tech-agent-card.json
+    note: Canonical A2A path; see a2a/atomadic-tech-a2a.yml for the grade.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    file: ../a2a/atomadic-tech-agent-card.json
+    note: Legacy pre-0.3 path; byte-identical to agent-card.json (cmp on 2026-09-19).
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-oauth-protected-resource.json
+    note: Hybrid document, not RFC 9728 conformant (no authorization_servers) — see rfc9728_note.
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-ai-plugin.json
+    note: OpenAI plugin manifest pointing api.url at https://atomadic.tech/openapi.json, auth type none.
+  - path: /.well-known/mcp.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-mcp.json
+    note: MCP discovery manifest for the aaaa-nexus server (serverUrl https://atomadic.tech/mcp, 44 tools with endpoint+method, stdio package aaaa-nexus-mcp on PyPI). Also served at /.well-known/mcp.
+  - path: /.well-known/pricing.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-pricing.json
+    note: Machine-readable x402 price manifest — per-path micro-USDC, free tier, credit packs, enterprise suites. Feeds plans/ and the overlay.
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/x402
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /api-status
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-api-status.json
+    note: Not a /.well-known path but linked from the footer; JSON health of the atomadic-mcp 0.6.9 catalog (129 tools in catalog, 8 bundled executable, 84 withheld, revenue_ready false).
+- host: https://www.atomadic.tech
+  documents:
+  - path: /.well-known/mcp.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-www-mcp.json
+    note: A DIFFERENT document from the apex mcp.json — names "Atomadic MCP Server" 0.6.9 at mcp_endpoint https://mcp.atomadic.tech with a products[] price list. www and apex are evidently different origins.
+  - path: /.well-known/security.txt
+    status: 404
+    body: Atomadic-branded HTML 404 page
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+- host: https://mcp.atomadic.tech
+  documents:
+  - path: /.well-known/atomadic-issuer-pubkey.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-mcp-issuer-pubkey.json
+    note: Ed25519 issuer key (key_id 141863afc6f7a6f1) used to sign entitlement tokens (ato_...) and closure receipts (atc_...).
+  - path: /.well-known/atomadic-closure.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-mcp-closure.json
+    note: Signed closure attestation; verifiable offline with the issuer key (recipe in the SDK README).
+  - path: /.well-known/atomadic-state.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-mcp-state.json
+    note: '"state of truth" — 12 products, 86 public / 77 internal tools, published_at 2026-06-21.'
+  - path: /.well-known/mcp-interlock.json
+    status: 200
+    content_type: application/json
+    file: atomadic-tech-mcp-interlock.json
+  - path: /.well-known/security.txt
+    status: 405
+  - path: /.well-known/openid-configuration
+    status: 405
+  - path: /.well-known/oauth-authorization-server
+    status: 405
+  - path: /.well-known/oauth-protected-resource
+    status: 405
+    note: RFC 9728 puts protected-resource metadata on the resource server; the MCP host refuses GET on it. Auth is a bearer entitlement key, not OAuth.
+  - path: /.well-known/api-catalog
+    status: 405
+  - path: /.well-known/ai-plugin.json
+    status: 405
+  - path: /.well-known/agent-card.json
+    status: 405
+  - path: /.well-known/agent.json
+    status: 405
+  - path: /.well-known/mcp.json
+    status: 405
+- host: https://nexus.atomadic.tech
+  documents:
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    file: ../a2a/atomadic-tech-nexus-agent-card.json
+    note: Legacy-path card "atomadic-nexus" 0.1.0, provider Atomadic Tech, 25 skills, snake_case capabilities, no protocolVersion — flavored, see a2a/.
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+- host: https://fuse.atomadic.tech
+  documents:
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    file: ../a2a/atomadic-tech-fuse-agent-card.json
+    note: Legacy-path card "atomadic-fuse" 1.2.0, provider Atomadic Tech, 14 skills — flavored, see a2a/.
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+- host: https://invest.atomadic.tech
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: text/html
+    note: SPA catch-all — the landing page for every path. NOT a document; recorded as a miss.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: text/html
+    note: SPA catch-all; miss.
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/html
+    note: SPA catch-all; miss.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: text/html
+    note: SPA catch-all; miss.

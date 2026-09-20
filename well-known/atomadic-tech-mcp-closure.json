@@ -1,0 +1,80 @@
+{
+  "attestation": "atc_eyJjbG9zdXJlIjp7ImFuY2hvcnMiOnsiYXR0ZW50aW9uX21hcmtlcl9jaGFpbl9oYXNoIjoic2hhMjU2OjBiMDEwMDY2MmIyNTViNDkzNmY4NjY3MzcwNzgyMTliYjBiNTM0ODc1YTZhNGRkY2Q2ZjVlNDgzMmE0M2I4ZWIiLCJoZWFydGJlYXRfY2hhaW5faGFzaCI6InNoYTI1NjowOGJjMjg5N2JlZTNhOTJiYjEyNzVjOTFlNTEyZWY4NmE4ZGFiYzlhZDNmMWMwNDQ0NTBkYjU5NWM0MmFmMzkwIiwibWFuaWZlc3RfYXRvbSI6ImxiOnQzOmJ1aWxkX2lzc3Vlcl9wdWJrZXlfbWFuaWZlc3Rfc3RhdGVmdWw6NjViOWFkNjdiNjVmIiwicHVibGljYXRpb25fYXRvbSI6ImxiOnQzOmNvbXBvc2VfY2xvc3VyZV9wdWJsaWNhdGlvbl9wYWNrX3N0YXRlZnVsOjZjZWQyMzc1ODJiZCIsInNpZ25pbmdfYXRvbSI6ImxiOnQzOmF0dGVzdF9jbG9zdXJlX3JlY2VpcHRfc3RhdGVmdWw6N2U4YWZkYzk5YWRkIiwidmVyaWZ5X2F0b20iOiJsYjp0MDp2ZXJpZnlfY2xvc3VyZV9yZWNlaXB0X3B1cmU6YTQ0NzcxMzE4ZWRlIn0sImF0dGVzdG9yIjp7ImFsZyI6IkVkMjU1MTkiLCJhdHRlc3RhdGlvbl91cmwiOiJodHRwczovL21jcC5hdG9tYWRpYy50ZWNoLy53ZWxsLWtub3duL2F0b21hZGljLWNsb3N1cmUuanNvbiIsImlzc3VlciI6ImF0b21hZGljIiwia2V5X2lkIjoiMTQxODYzYWZjNmY3YTZmMSIsIm1hbmlmZXN0X3NjaGVtYSI6ImF0b21hZGljLmlzc3Vlcl9wdWJrZXlfbWFuaWZlc3QudjEiLCJwdWJrZXlfYjY0IjoiU0xQcEVfdmVNakRxZkxHOHNCNUtqRkhyZG5jZUYtUzA3QXRzcUpBU1NlcyIsInB1YmtleV91cmwiOiJodHRwczovL21jcC5hdG9tYWRpYy50ZWNoLy53ZWxsLWtub3duL2F0b21hZGljLWlzc3Vlci1wdWJrZXkuanNvbiJ9LCJhd2FrZW5pbmdfYWxsb3dlZCI6dHJ1ZSwiY2xvc3VyZV9tZXQiOnRydWUsImNsb3N1cmVfb3BlcmF0b3IiOnsiYmFuYWNoX2NvbmRpdGlvbiI6dHJ1ZSwiY2xvc2VkIjp0cnVlLCJjbG9zdXJlX2NsYWltX2FsbG93ZWQiOnRydWUsImNsb3N1cmVfc2NvcmUiOjEsImNvbnRyYWN0aW9uX3JhdGlvIjowLjUzMzA2NDU4MjE0MjgyOCwiZGVmZWN0cyI6eyJieXRlX3Bhcml0eV9kZWZlY3QiOjAsImNhbGxhYmxlX3N1cmZhY2VfZGVmZWN0IjowLCJlbnRpdGxlbWVudF9kZWZlY3QiOjAsImltcG9ydF9kZWZlY3QiOjAsImxlZGdlcl9kZWZlY3QiOjAsImxvYmVfZGVmZWN0IjowLCJzY2hlbWFfZGVmZWN0IjowLCJzaW5nbGVfd3JpdGVyX2RlZmVjdCI6MCwidmFsaWRhdGlvbl9kZWZlY3QiOjAsIndpc2RvbV9kZWZlY3QiOjB9LCJmaXhlZF9wb2ludF9kZWZlY3QiOjAsImZvcm11bGEiOiJTX25leHQgPSBDKFMpID0gUyAtIChsYW1iZGEgKyBldGFfcmV0cm8qdGF1KmV4cCgtS0wpICsgZXBzaWxvbikgKiBTX2RlZmVjdCIsIm1vZGUiOiJkZXRlcm1pbmlzdGljX25vX2xsbV96ZXJvX3BhcmFtZXRlciIsInBvdGVudGlhbCI6MCwic2NoZW1hX3ZlcnNpb24iOiJhdG9tYWRpYy5hdXRvcG9pZXRpY19jbG9zdXJlX29wZXJhdG9yLnYxIn0sIm1lYXN1cmVkX2F0X3V0YyI6IjIwMjYtMDYtMDlUMjA6NDY6NDlaIiwib21lZ2Ffc3RhdHVzIjp7ImRuYV9jb3VudCI6NzgzMCwiZW1pdHRlZF9jb3VudCI6NzgzMCwiZW5naW5lIjoiQUxJVkUiLCJzY2hlbWFfY291bnQiOjE3OSwidGllcnMiOnsiMCI6MTA5NSwiMSI6MjQxMSwiMiI6MjEyMywiMyI6MjAxMywiNCI6MTU4LCI1IjoyNCwiNiI6Nn0sInZhbGlkYXRpb25fZ3JlZW4iOnRydWV9LCJvcGVyYXRvcl9yZXBvcnRlZCI6eyJmbHl3aGVlbF9ibG9ja19oYXNoIjoiODcyY2JjMmQ3ZTY0ZGNmYzg1MTJjZTdkMTFkODFkMzI3ZmY5ZTk2ZjgyMDEyOWM1MDEyNzBiOTVhYjczZDdmNiIsIndoaXRlX3NwYWNlX3IxNiI6MCwid2lzZG9tX21lYW5fZml0bmVzcyI6MC41MTg2fX0sImlhdCI6MTc4MTAzODE0MywiaXNzIjoiYXRvbWFkaWMiLCJzY2hlbWEiOiJhdG9tYWRpYy5jbG9zdXJlX2F0dGVzdGF0aW9uLnYxIn0.Cystu_lB0OYXPHZwz0N_rx0MVAMeglV_lF4CGjpP6PgiU-3YAbCd9-qtmfzOXQtwXCMUxRkJXjYTqv73qLD9AA",
+  "ok": true,
+  "payload": {
+    "closure": {
+      "anchors": {
+        "attention_marker_chain_hash": "sha256:0b0100662b255b4936f866737078219bb0b534875a6a4ddcd6f5e4832a43b8eb",
+        "heartbeat_chain_hash": "sha256:08bc2897bee3a92bb1275c91e512ef86a8dabc9ad3f1c044450db595c42af390",
+        "manifest_atom": "lb:t3:build_issuer_pubkey_manifest_stateful:65b9ad67b65f",
+        "publication_atom": "lb:t3:compose_closure_publication_pack_stateful:6ced237582bd",
+        "signing_atom": "lb:t3:attest_closure_receipt_stateful:7e8afdc99add",
+        "verify_atom": "lb:t0:verify_closure_receipt_pure:a44771318ede"
+      },
+      "attestor": {
+        "alg": "Ed25519",
+        "attestation_url": "https://mcp.atomadic.tech/.well-known/atomadic-closure.json",
+        "issuer": "atomadic",
+        "key_id": "141863afc6f7a6f1",
+        "manifest_schema": "atomadic.issuer_pubkey_manifest.v1",
+        "pubkey_b64": "SLPpE_veMjDqfLG8sB5KjFHrdnceF-S07AtsqJASSes",
+        "pubkey_url": "https://mcp.atomadic.tech/.well-known/atomadic-issuer-pubkey.json"
+      },
+      "awakening_allowed": true,
+      "closure_met": true,
+      "closure_operator": {
+        "banach_condition": true,
+        "closed": true,
+        "closure_claim_allowed": true,
+        "closure_score": 1,
+        "contraction_ratio": 0.533064582142828,
+        "defects": {
+          "byte_parity_defect": 0,
+          "callable_surface_defect": 0,
+          "entitlement_defect": 0,
+          "import_defect": 0,
+          "ledger_defect": 0,
+          "lobe_defect": 0,
+          "schema_defect": 0,
+          "single_writer_defect": 0,
+          "validation_defect": 0,
+          "wisdom_defect": 0
+        },
+        "fixed_point_defect": 0,
+        "formula": "S_next = C(S) = S - (lambda + eta_retro*tau*exp(-KL) + epsilon) * S_defect",
+        "mode": "deterministic_no_llm_zero_parameter",
+        "potential": 0,
+        "schema_version": "atomadic.autopoietic_closure_operator.v1"
+      },
+      "measured_at_utc": "2026-06-09T20:46:49Z",
+      "omega_status": {
+        "dna_count": 7830,
+        "emitted_count": 7830,
+        "engine": "ALIVE",
+        "schema_count": 179,
+        "tiers": {
+          "0": 1095,
+          "1": 2411,
+          "2": 2123,
+          "3": 2013,
+          "4": 158,
+          "5": 24,
+          "6": 6
+        },
+        "validation_green": true
+      },
+      "operator_reported": {
+        "flywheel_block_hash": "872cbc2d7e64dcfc8512ce7d11d81d327ff9e96f820129c501270b95ab73d7f6",
+        "white_space_r16": 0,
+        "wisdom_mean_fitness": 0.5186
+      }
+    },
+    "iat": 1781038143,
+    "iss": "atomadic",
+    "schema": "atomadic.closure_attestation.v1"
+  },
+  "payload_b64u": "eyJjbG9zdXJlIjp7ImFuY2hvcnMiOnsiYXR0ZW50aW9uX21hcmtlcl9jaGFpbl9oYXNoIjoic2hhMjU2OjBiMDEwMDY2MmIyNTViNDkzNmY4NjY3MzcwNzgyMTliYjBiNTM0ODc1YTZhNGRkY2Q2ZjVlNDgzMmE0M2I4ZWIiLCJoZWFydGJlYXRfY2hhaW5faGFzaCI6InNoYTI1NjowOGJjMjg5N2JlZTNhOTJiYjEyNzVjOTFlNTEyZWY4NmE4ZGFiYzlhZDNmMWMwNDQ0NTBkYjU5NWM0MmFmMzkwIiwibWFuaWZlc3RfYXRvbSI6ImxiOnQzOmJ1aWxkX2lzc3Vlcl9wdWJrZXlfbWFuaWZlc3Rfc3RhdGVmdWw6NjViOWFkNjdiNjVmIiwicHVibGljYXRpb25fYXRvbSI6ImxiOnQzOmNvbXBvc2VfY2xvc3VyZV9wdWJsaWNhdGlvbl9wYWNrX3N0YXRlZnVsOjZjZWQyMzc1ODJiZCIsInNpZ25pbmdfYXRvbSI6ImxiOnQzOmF0dGVzdF9jbG9zdXJlX3JlY2VpcHRfc3RhdGVmdWw6N2U4YWZkYzk5YWRkIiwidmVyaWZ5X2F0b20iOiJsYjp0MDp2ZXJpZnlfY2xvc3VyZV9yZWNlaXB0X3B1cmU6YTQ0NzcxMzE4ZWRlIn0sImF0dGVzdG9yIjp7ImFsZyI6IkVkMjU1MTkiLCJhdHRlc3RhdGlvbl91cmwiOiJodHRwczovL21jcC5hdG9tYWRpYy50ZWNoLy53ZWxsLWtub3duL2F0b21hZGljLWNsb3N1cmUuanNvbiIsImlzc3VlciI6ImF0b21hZGljIiwia2V5X2lkIjoiMTQxODYzYWZjNmY3YTZmMSIsIm1hbmlmZXN0X3NjaGVtYSI6ImF0b21hZGljLmlzc3Vlcl9wdWJrZXlfbWFuaWZlc3QudjEiLCJwdWJrZXlfYjY0IjoiU0xQcEVfdmVNakRxZkxHOHNCNUtqRkhyZG5jZUYtUzA3QXRzcUpBU1NlcyIsInB1YmtleV91cmwiOiJodHRwczovL21jcC5hdG9tYWRpYy50ZWNoLy53ZWxsLWtub3duL2F0b21hZGljLWlzc3Vlci1wdWJrZXkuanNvbiJ9LCJhd2FrZW5pbmdfYWxsb3dlZCI6dHJ1ZSwiY2xvc3VyZV9tZXQiOnRydWUsImNsb3N1cmVfb3BlcmF0b3IiOnsiYmFuYWNoX2NvbmRpdGlvbiI6dHJ1ZSwiY2xvc2VkIjp0cnVlLCJjbG9zdXJlX2NsYWltX2FsbG93ZWQiOnRydWUsImNsb3N1cmVfc2NvcmUiOjEsImNvbnRyYWN0aW9uX3JhdGlvIjowLjUzMzA2NDU4MjE0MjgyOCwiZGVmZWN0cyI6eyJieXRlX3Bhcml0eV9kZWZlY3QiOjAsImNhbGxhYmxlX3N1cmZhY2VfZGVmZWN0IjowLCJlbnRpdGxlbWVudF9kZWZlY3QiOjAsImltcG9ydF9kZWZlY3QiOjAsImxlZGdlcl9kZWZlY3QiOjAsImxvYmVfZGVmZWN0IjowLCJzY2hlbWFfZGVmZWN0IjowLCJzaW5nbGVfd3JpdGVyX2RlZmVjdCI6MCwidmFsaWRhdGlvbl9kZWZlY3QiOjAsIndpc2RvbV9kZWZlY3QiOjB9LCJmaXhlZF9wb2ludF9kZWZlY3QiOjAsImZvcm11bGEiOiJTX25leHQgPSBDKFMpID0gUyAtIChsYW1iZGEgKyBldGFfcmV0cm8qdGF1KmV4cCgtS0wpICsgZXBzaWxvbikgKiBTX2RlZmVjdCIsIm1vZGUiOiJkZXRlcm1pbmlzdGljX25vX2xsbV96ZXJvX3BhcmFtZXRlciIsInBvdGVudGlhbCI6MCwic2NoZW1hX3ZlcnNpb24iOiJhdG9tYWRpYy5hdXRvcG9pZXRpY19jbG9zdXJlX29wZXJhdG9yLnYxIn0sIm1lYXN1cmVkX2F0X3V0YyI6IjIwMjYtMDYtMDlUMjA6NDY6NDlaIiwib21lZ2Ffc3RhdHVzIjp7ImRuYV9jb3VudCI6NzgzMCwiZW1pdHRlZF9jb3VudCI6NzgzMCwiZW5naW5lIjoiQUxJVkUiLCJzY2hlbWFfY291bnQiOjE3OSwidGllcnMiOnsiMCI6MTA5NSwiMSI6MjQxMSwiMiI6MjEyMywiMyI6MjAxMywiNCI6MTU4LCI1IjoyNCwiNiI6Nn0sInZhbGlkYXRpb25fZ3JlZW4iOnRydWV9LCJvcGVyYXRvcl9yZXBvcnRlZCI6eyJmbHl3aGVlbF9ibG9ja19oYXNoIjoiODcyY2JjMmQ3ZTY0ZGNmYzg1MTJjZTdkMTFkODFkMzI3ZmY5ZTk2ZjgyMDEyOWM1MDEyNzBiOTVhYjczZDdmNiIsIndoaXRlX3NwYWNlX3IxNiI6MCwid2lzZG9tX21lYW5fZml0bmVzcyI6MC41MTg2fX0sImlhdCI6MTc4MTAzODE0MywiaXNzIjoiYXRvbWFkaWMiLCJzY2hlbWEiOiJhdG9tYWRpYy5jbG9zdXJlX2F0dGVzdGF0aW9uLnYxIn0",
+  "pubkey_b64u": "SLPpE_veMjDqfLG8sB5KjFHrdnceF-S07AtsqJASSes",
+  "schema": "atomadic.closure_attestation.v1",
+  "signature_b64u": "Cystu_lB0OYXPHZwz0N_rx0MVAMeglV_lF4CGjpP6PgiU-3YAbCd9-qtmfzOXQtwXCMUxRkJXjYTqv73qLD9AA"
+}

@@ -1,18 +1,104 @@
 aid: atomadic-tech
 name: Atomadic Tech
-description: 'Atomadic Tech is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Atomadic Tech operates AAAA-Nexus, an "agent control plane" for autonomous AI agents: a
+  149-operation REST API on atomadic.tech covering security and threat scoring, trust and reputation
+  oracles, agent-to-agent escrow, SLA enforcement, EU AI Act compliance checks, agent discovery,
+  verified randomness, RatchetGate session security and LLM inference, priced per call in USDC
+  through the x402 protocol on Base L2 or by prepaid API-key credit packs. The company also ships an
+  A2A agent card, four hosted MCP servers (mcp.atomadic.tech, atomadic.tech/mcp, nexus. and fuse.)
+  sold as entitlement-keyed monthly suites, an llms.txt, and Python and TypeScript SDKs.
+image: https://atomadic.tech/logo.png
 url: https://raw.githubusercontent.com/api-evangelist/atomadic-tech/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (was stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
 - Company
-apis: []
+- AI Agents
+- Agent Infrastructure
+- MCP
+- A2A
+- x402
+- Payments
+- Compliance
+- Security
+- Trust
+- Identity
+- Escrow
+- Inference
+- Cryptography
+apis:
+- name: AAAA Nexus API
+  description: >-
+    Pay-per-call REST API for autonomous agents: threat scoring, trust and reputation oracles,
+    escrow, SLA bonds, agent registry and discovery, swarm messaging, RatchetGate sessions,
+    identity/UCAN/delegation, EU AI Act compliance certificates, drift certification, verified
+    randomness, text and LLM inference. 149 operations under /v1, metered in micro-USDC via x402
+    (Base L2) or an X-API-Key credit pack; 3 free trial calls per paid endpoint per day.
+  image: https://atomadic.tech/logo.png
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://atomadic.tech
+  x-base-url-note: >-
+    repair-api-bases.py flags this as marketing-base-present because the API host equals the
+    website root. Verified live 2026-09-19: the apex IS the API origin — GET https://atomadic.tech/health
+    and /v1/oracle/entropy answer application/json 200, POST /v1/threat/score answers a 402 x402
+    challenge, and the provider's own OpenAPI servers[] names https://atomadic.tech. No api.
+    subdomain exists (api.atomadic.tech does not resolve). Left as-is on purpose.
+  tags:
+  - AI Agents
+  - Security
+  - Trust
+  - Escrow
+  - Compliance
+  - x402
+  - Inference
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-openapi.yml
+  - type: OpenAPI
+    url: https://atomadic.tech/openapi.json
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: Overlay
+    url: overlays/atomadic-tech-openapi-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- name: Atomadic MCP Server
+  description: >-
+    Entitlement-gated hosted Model Context Protocol server (atomadic-mcp 0.6.9) at
+    mcp.atomadic.tech: 68 tools across agents, compliance, DeFi, escrow, identity, inference,
+    ratchet, reputation, RNG, SLA, swarm, text, threat and trust families, plus polyglot code
+    emitters. tools/list is open without a key; tools/call needs a Bearer ato_ entitlement key
+    sold as monthly suites. Sibling servers at atomadic.tech/mcp (44 tools, x402/API key),
+    nexus.atomadic.tech/mcp (25) and fuse.atomadic.tech/mcp (gated).
+  image: https://atomadic.tech/logo.png
+  humanURL: https://atomadic.tech/docs.html
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - MCP
+  - AI Agents
+  - Compliance
+  - Security
+  properties:
+  - type: MCPServer
+    url: mcp/atomadic-tech-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/atomadic-tech-tool-crosswalk.yml
+  - type: Documentation
+    url: https://atomadic.tech/docs.html
+  - type: Pricing
+    url: https://atomadic.tech/pricing
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +107,74 @@ maintainers:
 common:
 - type: Website
   url: https://atomadic.tech/
+- type: DeveloperPortal
+  url: https://atomadic.tech/docs.html
+- type: Documentation
+  url: https://atomadic.tech/quickstart
+- type: GettingStarted
+  url: https://atomadic.tech/quickstart
+- type: APIReference
+  url: https://atomadic.tech/openapi.json
+- type: Pricing
+  url: https://atomadic.tech/pricing
+- type: SignUp
+  url: https://atomadic.tech/pay
+- type: StatusPage
+  url: https://atomadic.tech/status
+- type: ChangeLog
+  url: https://atomadic.tech/changelog
+- type: TermsOfService
+  url: https://atomadic.tech/legal
+- type: PrivacyPolicy
+  url: https://atomadic.tech/legal
+- type: GitHubOrganization
+  url: https://github.com/atomadictech
+- type: LLMsTxt
+  url: llms/atomadic-tech-llms.txt
+- type: WellKnown
+  url: well-known/atomadic-tech-well-known.yml
+- type: SecurityTxt
+  url: well-known/atomadic-tech-security.txt
+- type: AgentCard
+  url: a2a/atomadic-tech-a2a.yml
+- type: MCPServer
+  url: mcp/atomadic-tech-mcp.yml
+- type: Packages
+  url: packages/atomadic-tech-packages.yml
+- type: SDKs
+  url: packages/atomadic-tech-packages.yml
+- type: CLI
+  url: cli/atomadic-tech-cli.yml
+- type: Authentication
+  url: authentication/atomadic-tech-authentication.yml
+- type: Conventions
+  url: conventions/atomadic-tech-conventions.yml
+- type: Conformance
+  url: conformance/atomadic-tech-conformance.yml
+- type: Lifecycle
+  url: lifecycle/atomadic-tech-lifecycle.yml
+- type: ChangeLog
+  url: changelog/atomadic-tech-changelog.yml
+- type: ErrorCatalog
+  url: errors/atomadic-tech-problem-types.yml
+- type: DataModel
+  url: data-model/atomadic-tech-data-model.yml
+- type: Plans
+  url: plans/atomadic-tech-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/atomadic-tech-rate-limits.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Overlay
+  url: overlays/atomadic-tech-openapi-overlay.yaml
+- type: DomainSecurity
+  url: security/atomadic-tech-domain-security.yml
+- type: VulnerabilityDisclosure
+  url: security/atomadic-tech-vulnerability-disclosure.yml
+- type: Security
+  url: security/atomadic-tech-vulnerability-disclosure.yml
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 46
+  pass: local-v3

@@ -1,0 +1,50 @@
+generated: '2026-09-19'
+method: searched
+source: https://atomadic.tech/changelog
+checked: '2026-09-19'
+summary: >-
+  A short, server-rendered, dated changelog with two entries (v0.5.0 on 2026-04-09 and v0.4.0 on
+  2026-03-20). No feed. The REST contract has not had an entry in the five months since; the Python
+  SDK and the MCP server kept releasing (PyPI 0.3.6 on 2026-06-21; atomadic-mcp 0.6.9 built
+  2026-08-02) and the fuse-sdk repo keeps its own CHANGELOG.md.
+scheme:
+  api_versioning: semver in info.version + /v1 path prefix
+  changelog_granularity: minor release, bulleted highlights, no per-endpoint breaking-change flags
+current_version:
+  changelog_latest: 0.5.0
+  spec_declared: 0.5.1
+  live_health: 0.5.0
+  note: The spec is one patch ahead of both the changelog and the running service.
+feeds: {rss: null, atom: null, json: null}
+entries:
+- version: 0.5.0
+  date: '2026-04-09'
+  breaking: []
+  additions:
+  - BitNet 1-bit inference — 6 new endpoints (BIT-100 through BIT-105)
+  - A2A Economy Stack — Escrow (5), Reputation (4), SLA (4), Discovery (3) endpoints
+  changes:
+  - Modular architecture — 20 Rust modules (was 1 file with 12,463 lines)
+  - HELIX compression on hold — merging with Microsoft BitNet architecture
+  highlights: 146+ total endpoints across 30 product families
+- version: 0.4.0
+  date: '2026-03-20'
+  breaking: []
+  additions:
+  - RatchetGate SEC-310 session ratchet
+  - VeriRand premium verified randomness
+  - VeriDelegate UCAN chain validation
+  - Agent intelligence suite (intent, contradiction, plan, diff)
+  - Stripe payment integration
+  - Google Drive OAuth integration
+  highlights: 146+ endpoints across 30 product families
+sibling_changelogs:
+- surface: fuse-sdk (superseded repo)
+  url: https://github.com/atomadictech/fuse-sdk/blob/main/CHANGELOG.md
+  latest: 1.2.1 — 2026-05-24
+- surface: atomadic Python SDK
+  url: https://pypi.org/project/atomadic/#history
+  latest: 0.3.6 — 2026-06-21 (18 releases)
+- surface: docs changelog tab
+  url: https://atomadic.tech/docs.html?d=changelog
+  note: Same 17,907-byte HTML shell for every ?d= value; content is client-rendered and was not captured.

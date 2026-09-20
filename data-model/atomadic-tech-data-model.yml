@@ -1,0 +1,206 @@
+generated: '2026-09-19'
+method: derived
+source: Derived from openapi/atomadic-tech-openapi.yml. The contract declares only two named schemas (HelixStatus, ChatMessage);
+  every request and response body is inline, so the entity graph below is read from *_id fields in parameters and request
+  bodies (28 distinct id fields across 149 operations), not from $ref links.
+caveat: No component schemas exist for the entities, so field lists per entity are not recoverable from the contract. Entities
+  are named after their id field; relationships are the id-references one operation body carries to another entity.
+id_scheme:
+  style: opaque string ids, mostly server-issued (escrow_id, sla_id, session_id, key_id, draw_id); agent_id is client-chosen
+    on registerAgent
+  prefixes: none documented
+  examples_in_spec:
+  - sess-001 (session_id)
+entities:
+- name: Agent
+  id_field: agent_id
+  operations:
+  - analyzeThreat
+  - blockThreat
+  - challengeIdentity
+  - deregisterAgent
+  - getAgentCapabilities
+  - getAgentHealth
+  - getAgentReputation
+  - getAgentStatus
+  - getDelegationChain
+  - getDelegationDepth
+  - getReputationHistory
+  - getReputationScore
+  - getThreatHistory
+  - getTrustHistory
+  - getTrustScore
+  - listDelegations
+  - lookupIdentity
+  - recordReputation
+  - registerAgent
+  - registerIdentity
+  - reportThreat
+  - revokeIdentity
+  - scoreThreat
+  - shieldSession
+  - swarmJoin
+  - swarmLeave
+  - updateAgent
+  - verifyIdentity
+  note: 'The hub of the graph: registered via registerAgent, referenced by 28 operations across trust, reputation, escrow,
+    SLA, swarm, identity and compliance.'
+- name: Session (RatchetGate)
+  id_field: session_id
+  operations:
+  - getShieldStatus
+  - ratchetAdvanceSession
+  - ratchetRegisterSession
+  - ratchetRevoke
+  - ratchetStatus
+  - ratchetVerify
+  - shieldPostQuantum
+  - shieldRotate
+  - shieldVerify
+  - verifyPayment
+- name: Escrow
+  id_field: escrow_id
+  operations:
+  - disputeEscrow
+  - getEscrowStatus
+  - releaseEscrow
+- name: SLA
+  id_field: sla_id
+  operations:
+  - getSlaStatus
+  - reportSlaViolation
+- name: System (compliance subject)
+  id_field: system_id
+  operations:
+  - euAiActCertificate
+  - getIncidents
+  - getOversightHistory
+  - logOversight
+  - reportIncident
+  - transparencyReport
+- name: Model
+  id_field: model_id
+  operations:
+  - dataLineage
+  - driftCheck
+  - explainabilityCertificate
+  - fairnessProof
+  - submitForgeDelta
+  - verifyForgeModel
+- name: Swarm group
+  id_field: group_id
+  operations:
+  - swarmBroadcast
+  - swarmJoin
+  - swarmLeave
+- name: Key
+  id_field: key_id
+  operations:
+  - revokeKeys
+  - rotateKeys
+- name: VRF draw
+  id_field: draw_id
+  operations:
+  - vrfVerifyDraw
+- name: Decision (lineage)
+  id_field: decision_id
+  operations:
+  - explainabilityCertificate
+- name: Dataset
+  id_field: dataset_id
+  operations:
+  - fairnessProof
+- name: Contract (behavioural)
+  id_field: contract_id
+  operations:
+  - defiContractAudit
+relationships:
+- from: Escrow
+  to: Agent
+  type: belongs_to
+  via: payer_id
+  operation: createEscrow
+- from: Escrow
+  to: Agent
+  type: belongs_to
+  via: payee_id
+  operation: createEscrow
+- from: SLA
+  to: Agent
+  type: belongs_to
+  via: provider_id / consumer_id
+  operation: registerSla
+- from: Reputation record
+  to: Agent
+  type: belongs_to
+  via: agent_id + counterparty_id
+  operation: recordReputation
+- from: Agent message
+  to: Agent
+  type: belongs_to
+  via: from_agent_id -> to_agent_id
+  operation: messageAgent
+- from: Negotiation
+  to: Agent
+  type: belongs_to
+  via: initiator_id / responder_id
+  operation: negotiateAgents
+- from: Delegated task
+  to: Agent
+  type: belongs_to
+  via: agent_id -> target_agent_id
+  operation: delegateTask
+- from: Swarm group
+  to: Agent
+  type: has_many
+  via: group_id on swarmJoin/swarmLeave/swarmBroadcast
+  operation: swarmJoin
+- from: Session (RatchetGate)
+  to: Agent
+  type: belongs_to
+  via: agent_id (quickstart example body)
+  operation: ratchetRegisterSession
+- from: Oversight / incident record
+  to: System (compliance subject)
+  type: belongs_to
+  via: system_id + reviewer_id
+  operation: logOversight
+- from: Drift certificate
+  to: Model
+  type: belongs_to
+  via: model_id
+  operation: getDriftCertificate
+- from: Forge badge
+  to: Model
+  type: belongs_to
+  via: '{model} path parameter'
+  operation: getForgeBadge
+id_fields_observed:
+  agent_id: 28
+  session_id: 10
+  system_id: 6
+  model_id: 6
+  group_id: 3
+  escrow_id: 3
+  target_agent_id: 2
+  sla_id: 2
+  key_id: 2
+  sender_agent_id: 1
+  initiator_id: 1
+  responder_id: 1
+  from_agent_id: 1
+  to_agent_id: 1
+  dataset_id: 1
+  decision_id: 1
+  reviewer_id: 1
+  price_id: 1
+  position_id: 1
+  bridge_id: 1
+  contract_id: 1
+  game_id: 1
+  draw_id: 1
+  provider_id: 1
+  consumer_id: 1
+  payer_id: 1
+  payee_id: 1
+  counterparty_id: 1

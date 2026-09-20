@@ -1,0 +1,20 @@
+{
+  "alg": "Ed25519",
+  "attestation_schema": "atomadic.closure_attestation.v1",
+  "attestation_url": "https://mcp.atomadic.tech/.well-known/atomadic-closure.json",
+  "entitlement_signing_atom": "lb:t3:attest_entitlement_token_stateful",
+  "entitlement_verify_atom": "lb:t0:verify_entitlement_token_pure",
+  "issuer": "atomadic",
+  "key": "SLPpE_veMjDqfLG8sB5KjFHrdnceF-S07AtsqJASSes",
+  "key_format": "base64url_no_pad_raw_32_bytes",
+  "key_id": "141863afc6f7a6f1",
+  "publication_url": "https://mcp.atomadic.tech/.well-known/atomadic-issuer-pubkey.json",
+  "published_at_utc": "2026-06-09T20:49:03Z",
+  "schema": "atomadic.issuer_pubkey_manifest.v1",
+  "signing_atom": "lb:t3:attest_closure_receipt_stateful:7e8afdc99add",
+  "token_formats": {
+    "closure_attestation": "atc_<b64url(payload)>.<b64url(sig)>",
+    "entitlement": "ato_<b64url(payload)>.<b64url(sig)>"
+  },
+  "verify_atom": "lb:t0:verify_closure_receipt_pure:a44771318ede"
+}

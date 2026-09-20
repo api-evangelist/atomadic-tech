@@ -1,0 +1,79 @@
+{
+  "$schema": "https://mcp.atomadic.tech/schemas/mcp-discovery.v1.json",
+  "name": "Atomadic MCP Server",
+  "version": "0.6.9",
+  "description": "Deterministic, microsecond-latency AI compliance, guardrail firewalling, code modernization, and holographic vector memory tools.",
+  "mcp_endpoint": "https://mcp.atomadic.tech",
+  "issuer_pubkey_url": "https://mcp.atomadic.tech/.well-known/atomadic-issuer-pubkey.json",
+  "state_url": "https://mcp.atomadic.tech/.well-known/atomadic-state.json",
+  "documentation_url": "https://atomadic.tech/docs.html",
+  "llms_txt_url": "https://atomadic.tech/llms.txt",
+  "x402_payment_rail": "https://mcp.atomadic.tech/.well-known/mcp-interlock.json",
+  "products": [
+    {
+      "id": "organ_650_verifier",
+      "name": "Atomadic EU AI Act Signed Verifier (x402 Rail)",
+      "sku": "verify-suite",
+      "organ": "synthesize__receipt__verdict__io",
+      "latency_micros": 180,
+      "price_per_req_usd": 0.001,
+      "price_usd_mo": 999
+    },
+    {
+      "id": "guardrail",
+      "name": "Atomadic Guardrail Gateway",
+      "sku": "verify-suite",
+      "organ": "enforce__envelope__verdict__pure",
+      "latency_micros": 180,
+      "price_usd_mo": 199
+    },
+    {
+      "id": "autodoc",
+      "name": "Atomadic Aegis Auto-Doc",
+      "sku": "verify-suite",
+      "organ": "synthesize__manifest__proof__pure",
+      "latency_micros": 22.2,
+      "price_usd_mo": 499
+    },
+    {
+      "id": "transmute",
+      "name": "Atomadic Transmute Core",
+      "sku": "intel-suite",
+      "organ": "synthesize__uast__source__pure",
+      "latency_micros": 7.7,
+      "price_usd_mo": 4999
+    },
+    {
+      "id": "hypervector",
+      "name": "Atomadic HyperVector RAM",
+      "sku": "agents-suite",
+      "organ": "query__hypervector__state__pure",
+      "latency_micros": 626.7,
+      "price_usd_mo": 49
+    },
+    {
+      "id": "sentinel",
+      "name": "Atomadic Sentinel",
+      "sku": "verify-suite",
+      "organ": "assess__envelope__verdict__pure",
+      "latency_micros": 450,
+      "price_usd_mo": 299
+    },
+    {
+      "id": "studio",
+      "name": "Atomadic Synthesis Studio",
+      "sku": "intel-suite",
+      "organ": "synthesize__uast__text__pure",
+      "latency_micros": 90,
+      "price_usd_mo": 149
+    },
+    {
+      "id": "autonomy_guard",
+      "name": "Atomadic Autonomy Guard",
+      "sku": "agents-suite",
+      "organ": "enforce__uast__verdict__pure",
+      "latency_micros": 190,
+      "price_usd_mo": 399
+    }
+  ]
+}
