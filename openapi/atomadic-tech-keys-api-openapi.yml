@@ -1,0 +1,225 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Keys API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Keys across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Keys
+  description: Cryptographic key generation, rotation, and revocation
+paths:
+  /v1/keys/generate:
+    post:
+      operationId: generateKeys
+      summary: Generate cryptographic key pair
+      description: Generate a new cryptographic key pair for agent identity or encryption.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                algorithm:
+                  type: string
+                  example: ed25519
+                label:
+                  type: string
+      responses:
+        '200':
+          description: Key pair generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key_id:
+                    type: string
+                  public_key:
+                    type: string
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/keys/rotate:
+    post:
+      operationId: rotateKeys
+      summary: Rotate keys
+      description: Rotate an existing key pair, generating a new key and deprecating the old one.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - key_id
+              properties:
+                key_id:
+                  type: string
+      responses:
+        '200':
+          description: Keys rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  old_key_id:
+                    type: string
+                  new_key_id:
+                    type: string
+                  new_public_key:
+                    type: string
+                  rotated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/keys/revoke:
+    post:
+      operationId: revokeKeys
+      summary: Revoke keys
+      description: Revoke a key pair, marking it as permanently unusable.
+      tags:
+      - Keys
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - key_id
+              properties:
+                key_id:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Keys revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key_id:
+                    type: string
+                  revoked:
+                    type: boolean
+                  revoked_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

@@ -1,0 +1,91 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Rag API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Rag across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Rag
+paths:
+  /v1/rag/augment:
+    post:
+      operationId: postTrustedRagAugment
+      summary: Trusted RAG augmentation
+      description: Returns public-safe grounded context, provenance hashes, freshness metadata, confidence, and a structured envelope.
+      tags:
+      - Rag
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Trusted RAG envelope
+          content:
+            application/json:
+              schema:
+                type: object
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

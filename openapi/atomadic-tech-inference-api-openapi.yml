@@ -1,0 +1,373 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Inference API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Inference across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Inference
+  description: LLM inference with built-in hallucination guard
+paths:
+  /v1/inference:
+    post:
+      operationId: chatInference
+      summary: Chat inference with hallucination guard
+      description: LLM chat completion with built-in hallucination guard and safety guarantees. Costs $0.015/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - messages
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                  example:
+                  - role: user
+                    content: What is formal verification?
+      responses:
+        '200':
+          description: Chat completion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  hallucination_bound:
+                    type: number
+                    format: float
+                  verified:
+                    type: boolean
+                  usage:
+                    type: object
+                    properties:
+                      prompt_tokens:
+                        type: integer
+                      completion_tokens:
+                        type: integer
+                      total_tokens:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/inference/stream:
+    post:
+      operationId: streamInference
+      summary: Streaming inference with chain-of-thought
+      description: Streaming LLM inference via Server-Sent Events (SSE) with reasoning trace. Costs $0.025/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - messages
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                  example:
+                  - role: user
+                    content: Explain formal verification step by step.
+      responses:
+        '200':
+          description: SSE stream of completion chunks and chain-of-thought
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events stream. Each event is a JSON object with a 'type' field ('thinking', 'content', or 'done').
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/inference/embeddings:
+    post:
+      operationId: inferenceEmbeddings
+      summary: Generate embeddings
+      description: Generate text embeddings using the inference engine. Costs $0.01/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - input
+              properties:
+                input:
+                  type: string
+                model:
+                  type: string
+      responses:
+        '200':
+          description: Embeddings result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embedding:
+                    type: array
+                    items:
+                      type: number
+                  dimensions:
+                    type: integer
+                  model:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/inference/classify:
+    post:
+      operationId: inferenceClassify
+      summary: Text classification via inference
+      description: Classify text using the inference engine. Costs $0.01/call.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/inference/models:
+    get:
+      operationId: listInferenceModels
+      summary: List available inference models
+      description: List all available inference models. Free endpoint.
+      tags:
+      - Inference
+      responses:
+        '200':
+          description: Available models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        context_length:
+                          type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compress:
+    post:
+      operationId: compressData
+      summary: HELIX tensor compression
+      description: Compress data using HELIX tensor compression. Free tier and paid pro tier available.
+      tags:
+      - Inference
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: string
+                  description: Data to compress
+      responses:
+        '200':
+          description: Compressed output
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compressed:
+                    type: string
+                  original_size:
+                    type: integer
+                  compressed_size:
+                    type: integer
+                  ratio:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  schemas:
+    ChatMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          description: Message role
+        content:
+          type: string
+          description: Message content
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

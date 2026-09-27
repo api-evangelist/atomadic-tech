@@ -1,0 +1,275 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Veri Rand API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged VeriRand across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: VeriRand
+  description: Premium verifiable random bytes and batch/stream RNG
+paths:
+  /v1/rng/seeded:
+    post:
+      operationId: seededRng
+      summary: Seeded deterministic RNG
+      description: Generate deterministic random values from a provided seed. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - seed
+              properties:
+                seed:
+                  type: string
+                  example: my-deterministic-seed
+                count:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Deterministic random values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                  seed:
+                    type: string
+                  count:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/rng/batch:
+    post:
+      operationId: batchRng
+      summary: Batch random generation
+      description: Generate a batch of random values in a single request. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - count
+              properties:
+                count:
+                  type: integer
+                  example: 100
+                bits:
+                  type: integer
+                  example: 256
+      responses:
+        '200':
+          description: Batch random values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  values:
+                    type: array
+                    items:
+                      type: string
+                  count:
+                    type: integer
+                  bits:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/rng/stream:
+    post:
+      operationId: streamRng
+      summary: Streaming random values
+      description: Stream random values via Server-Sent Events. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  example: 1000
+                bits:
+                  type: integer
+                  example: 256
+                interval_ms:
+                  type: integer
+                  example: 100
+      responses:
+        '200':
+          description: SSE stream of random values
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events stream of random values
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/verirand/bytes:
+    post:
+      operationId: verirandBytes
+      summary: Premium verifiable random bytes
+      description: Generate premium verifiable random bytes with cryptographic proof. Paid endpoint.
+      tags:
+      - VeriRand
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - length
+              properties:
+                length:
+                  type: integer
+                  example: 32
+                  description: Number of bytes to generate
+      responses:
+        '200':
+          description: Verifiable random bytes with proof
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bytes:
+                    type: string
+                    description: Hex-encoded random bytes
+                  length:
+                    type: integer
+                  proof:
+                    type: string
+                  verified:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

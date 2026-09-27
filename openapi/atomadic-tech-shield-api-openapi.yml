@@ -1,0 +1,318 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Shield API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Shield across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Shield
+  description: 'AAAA Shield: post-quantum key exchange, session management, key rotation'
+paths:
+  /v1/shield/session:
+    post:
+      operationId: shieldSession
+      summary: Initialize Shield session
+      description: Initialize an AAAA Shield session for post-quantum secure communication.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                algorithm:
+                  type: string
+                  example: kyber-1024
+      responses:
+        '200':
+          description: Shield session initialized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  public_key:
+                    type: string
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/shield/post-quantum:
+    post:
+      operationId: shieldPostQuantum
+      summary: Post-quantum key exchange
+      description: Perform a post-quantum key exchange using Kyber or similar lattice-based algorithms.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              - public_key
+              properties:
+                session_id:
+                  type: string
+                public_key:
+                  type: string
+      responses:
+        '200':
+          description: Key exchange result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  shared_secret_hash:
+                    type: string
+                  algorithm:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/shield/verify:
+    post:
+      operationId: shieldVerify
+      summary: Verify Shield session
+      description: Verify the integrity of an AAAA Shield session.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Shield verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  valid:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/shield/rotate:
+    post:
+      operationId: shieldRotate
+      summary: Rotate Shield keys
+      description: Rotate the cryptographic keys for an AAAA Shield session.
+      tags:
+      - Shield
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Keys rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  new_public_key:
+                    type: string
+                  rotated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/shield/status:
+    get:
+      operationId: getShieldStatus
+      summary: Shield status
+      description: Get the status of an AAAA Shield session.
+      tags:
+      - Shield
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Shield session ID
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Shield status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - expired
+                    - revoked
+                  algorithm:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  last_rotated:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

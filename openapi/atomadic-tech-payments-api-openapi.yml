@@ -1,0 +1,157 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Payments API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Payments across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Payments
+  description: Stripe payment sessions, price listing, and payment verification
+paths:
+  /v1/payments/stripe/session:
+    post:
+      operationId: createStripeSession
+      summary: Create Stripe Checkout session
+      description: Create a Stripe Checkout session for purchasing credit or prompt packs. No authentication required.
+      tags:
+      - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - price_id
+              properties:
+                price_id:
+                  type: string
+                  description: Stripe price ID
+                success_url:
+                  type: string
+                cancel_url:
+                  type: string
+      responses:
+        '200':
+          description: Stripe Checkout session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  url:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/payments/stripe/prices:
+    get:
+      operationId: getStripePrices
+      summary: List active Stripe prices
+      description: List all active Stripe prices for credit and prompt packs. No authentication required.
+      tags:
+      - Payments
+      responses:
+        '200':
+          description: Active Stripe prices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        amount:
+                          type: integer
+                        currency:
+                          type: string
+                        credits:
+                          type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/pay/verify:
+    post:
+      operationId: verifyPayment
+      summary: Verify payment and retrieve API key
+      description: Verify a completed payment and retrieve the associated API key. No authentication required.
+      tags:
+      - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  description: Stripe Checkout session ID
+      responses:
+        '200':
+          description: Payment verified, API key returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  api_key:
+                    type: string
+                  credits:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

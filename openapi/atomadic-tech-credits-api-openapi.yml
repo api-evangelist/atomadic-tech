@@ -1,0 +1,143 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Credits API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Credits across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Credits
+  description: Credit balance, usage history, and detailed usage breakdown
+paths:
+  /v1/credits/balance:
+    get:
+      operationId: getCreditBalance
+      summary: Check credit balance
+      description: Check the remaining credit balance for the API key.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Credit balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                  currency:
+                    type: string
+                    example: USD
+                  last_charged:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/credits/history:
+    get:
+      operationId: getCreditHistory
+      summary: Credit usage history
+      description: Retrieve credit usage history for the API key.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Credit history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        endpoint:
+                          type: string
+                        amount:
+                          type: number
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/credits/usage:
+    get:
+      operationId: getCreditUsage
+      summary: Detailed usage breakdown
+      description: Get a detailed breakdown of credit usage by endpoint and time period.
+      tags:
+      - Credits
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Usage breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: string
+                  total_spent:
+                    type: number
+                  by_endpoint:
+                    type: object
+                  by_day:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

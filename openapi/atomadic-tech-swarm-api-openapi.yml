@@ -1,0 +1,333 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Swarm API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Swarm across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Swarm
+  description: 'Swarm messaging: relay, broadcast, join, leave, topology, peers'
+paths:
+  /v1/swarm/relay:
+    post:
+      operationId: swarmRelay
+      summary: Relay message through swarm
+      description: Relay a message through the swarm network to reach a target agent.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target_agent_id
+              - message
+              properties:
+                target_agent_id:
+                  type: string
+                message:
+                  type: object
+                ttl:
+                  type: integer
+                  description: Hop limit for relay
+      responses:
+        '200':
+          description: Message relayed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay_id:
+                    type: string
+                  hops:
+                    type: integer
+                  delivered:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/broadcast:
+    post:
+      operationId: swarmBroadcast
+      summary: Broadcast to all swarm members
+      description: Broadcast a message to all members of the swarm group.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - message
+              properties:
+                message:
+                  type: object
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Broadcast sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  broadcast_id:
+                    type: string
+                  recipients:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/join:
+    post:
+      operationId: swarmJoin
+      summary: Join swarm group
+      description: Join a swarm group to receive broadcasts and participate in swarm activities.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Joined swarm group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  group_id:
+                    type: string
+                  joined_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/leave:
+    post:
+      operationId: swarmLeave
+      summary: Leave swarm group
+      description: Leave a swarm group.
+      tags:
+      - Swarm
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                group_id:
+                  type: string
+      responses:
+        '200':
+          description: Left swarm group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  group_id:
+                    type: string
+                  left_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/topology:
+    get:
+      operationId: getSwarmScopedTopology
+      summary: Swarm-scoped topology
+      description: Returns swarm-scoped topology. Same data as /v1/agents/topology but scoped to the swarm group.
+      tags:
+      - Swarm
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                  edges:
+                    type: integer
+                  average_degree:
+                    type: number
+                    format: float
+                  components:
+                    type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/peers:
+    get:
+      operationId: getSwarmPeers
+      summary: List swarm peers
+      description: List all peers in the swarm group.
+      tags:
+      - Swarm
+      responses:
+        '200':
+          description: Swarm peers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  peers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        status:
+                          type: string
+                        joined_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

@@ -1,0 +1,221 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Audit API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Audit across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Audit
+  description: Audit event logging, trail retrieval, and export
+paths:
+  /v1/audit/log:
+    post:
+      operationId: logAuditEvent
+      summary: Log audit event
+      description: Log an audit event. Costs $0.02/event.
+      tags:
+      - Audit
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - event_type
+              - details
+              properties:
+                event_type:
+                  type: string
+                actor:
+                  type: string
+                details:
+                  type: object
+      responses:
+        '200':
+          description: Audit event logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: string
+                  logged_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/audit/trail:
+    get:
+      operationId: getAuditTrail
+      summary: Retrieve audit trail
+      description: Retrieve the audit trail. Costs $0.02/query.
+      tags:
+      - Audit
+      parameters:
+      - name: actor
+        in: query
+        schema:
+          type: string
+        description: Filter by actor
+      - name: event_type
+        in: query
+        schema:
+          type: string
+        description: Filter by event type
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Audit trail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        event_id:
+                          type: string
+                        event_type:
+                          type: string
+                        actor:
+                          type: string
+                        details:
+                          type: object
+                        timestamp:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/audit/export:
+    get:
+      operationId: exportAuditLog
+      summary: Export audit log
+      description: Export the full audit log. Costs $0.08/export.
+      tags:
+      - Audit
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Audit log export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  export_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  exported_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

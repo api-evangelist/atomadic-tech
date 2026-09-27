@@ -1,0 +1,254 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Forge API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Forge across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Forge
+  description: 'Model marketplace: leaderboard, quarantine, verification, delta submission, badges'
+paths:
+  /v1/forge/leaderboard:
+    get:
+      operationId: getForgeLeaderboard
+      summary: Model leaderboard
+      description: Browse the model leaderboard. Free endpoint.
+      tags:
+      - Forge
+      responses:
+        '200':
+          description: Model leaderboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                        rank:
+                          type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/quarantine:
+    get:
+      operationId: getForgeQuarantine
+      summary: Quarantined models
+      description: View quarantined models that failed verification. Free endpoint.
+      tags:
+      - Forge
+      responses:
+        '200':
+          description: Quarantined models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        reason:
+                          type: string
+                        quarantined_at:
+                          type: string
+                          format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/verify:
+    post:
+      operationId: verifyForgeModel
+      summary: Verify a model submission
+      description: Verify a model submission for the Forge marketplace. Requires API key.
+      tags:
+      - Forge
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              properties:
+                model_id:
+                  type: string
+                verification_type:
+                  type: string
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  verified:
+                    type: boolean
+                  issues:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/delta/submit:
+    post:
+      operationId: submitForgeDelta
+      summary: Submit a model delta
+      description: Submit a model delta (incremental update) to the Forge marketplace. Requires API key.
+      tags:
+      - Forge
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - delta
+              properties:
+                model_id:
+                  type: string
+                delta:
+                  type: object
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Delta submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delta_id:
+                    type: string
+                  model_id:
+                    type: string
+                  status:
+                    type: string
+                  submitted_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/badge/{model}:
+    get:
+      operationId: getForgeBadge
+      summary: Model quality badge
+      description: Get a quality badge for a model. Free endpoint.
+      tags:
+      - Forge
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Model identifier
+      responses:
+        '200':
+          description: Model badge
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  badge:
+                    type: string
+                    enum:
+                    - gold
+                    - silver
+                    - bronze
+                    - none
+                  score:
+                    type: number
+                    format: float
+                  verified:
+                    type: boolean
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

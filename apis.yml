@@ -33,55 +33,13 @@ tags:
 - Inference
 - Cryptography
 apis:
-- name: AAAA Nexus API
-  description: >-
-    Pay-per-call REST API for autonomous agents: threat scoring, trust and reputation oracles,
-    escrow, SLA bonds, agent registry and discovery, swarm messaging, RatchetGate sessions,
-    identity/UCAN/delegation, EU AI Act compliance certificates, drift certification, verified
-    randomness, text and LLM inference. 149 operations under /v1, metered in micro-USDC via x402
-    (Base L2) or an X-API-Key credit pack; 3 free trial calls per paid endpoint per day.
-  image: https://atomadic.tech/logo.png
-  humanURL: https://atomadic.tech/quickstart
-  baseURL: https://atomadic.tech
-  x-base-url-note: >-
-    repair-api-bases.py flags this as marketing-base-present because the API host equals the
-    website root. Verified live 2026-09-19: the apex IS the API origin — GET https://atomadic.tech/health
-    and /v1/oracle/entropy answer application/json 200, POST /v1/threat/score answers a 402 x402
-    challenge, and the provider's own OpenAPI servers[] names https://atomadic.tech. No api.
-    subdomain exists (api.atomadic.tech does not resolve). Left as-is on purpose.
-  tags:
-  - AI Agents
-  - Security
-  - Trust
-  - Escrow
-  - Compliance
-  - x402
-  - Inference
-  properties:
-  - type: OpenAPI
-    url: openapi/atomadic-tech-openapi.yml
-  - type: OpenAPI
-    url: https://atomadic.tech/openapi.json
-  - type: Documentation
-    url: https://atomadic.tech/quickstart
-  - type: APIReference
-    url: https://atomadic.tech/openapi.json
-  - type: Overlay
-    url: overlays/atomadic-tech-openapi-overlay.yaml
-  - type: ErrorCatalog
-    url: errors/atomadic-tech-problem-types.yml
-  - type: DataModel
-    url: data-model/atomadic-tech-data-model.yml
-  - type: AgentCard
-    url: a2a/atomadic-tech-a2a.yml
 - name: Atomadic MCP Server
   description: >-
-    Entitlement-gated hosted Model Context Protocol server (atomadic-mcp 0.6.9) at
-    mcp.atomadic.tech: 68 tools across agents, compliance, DeFi, escrow, identity, inference,
-    ratchet, reputation, RNG, SLA, swarm, text, threat and trust families, plus polyglot code
-    emitters. tools/list is open without a key; tools/call needs a Bearer ato_ entitlement key
-    sold as monthly suites. Sibling servers at atomadic.tech/mcp (44 tools, x402/API key),
-    nexus.atomadic.tech/mcp (25) and fuse.atomadic.tech/mcp (gated).
+    Entitlement-gated hosted Model Context Protocol server (atomadic-mcp 0.6.9) at mcp.atomadic.tech:
+    68 tools across agents, compliance, DeFi, escrow, identity, inference, ratchet, reputation, RNG, SLA,
+    swarm, text, threat and trust families, plus polyglot code emitters. tools/list is open without a
+    key; tools/call needs a Bearer ato_ entitlement key sold as monthly suites. Sibling servers at atomadic.tech/mcp
+    (44 tools, x402/API key), nexus.atomadic.tech/mcp (25) and fuse.atomadic.tech/mcp (gated).
   image: https://atomadic.tech/logo.png
   humanURL: https://atomadic.tech/docs.html
   baseURL: https://mcp.atomadic.tech
@@ -99,6 +57,569 @@ apis:
     url: https://atomadic.tech/docs.html
   - type: Pricing
     url: https://atomadic.tech/pricing
+- aid: atomadic-tech:atomadic-tech-agents-api
+  name: Atomadic Tech Agents API
+  description: Agent registration, topology, planning, intent classification, and reputation
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Agents
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-agents-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-audit-api
+  name: Atomadic Tech Audit API
+  description: Audit event logging, trail retrieval, and export
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Audit
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-audit-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-compliance-api
+  name: Atomadic Tech Compliance API
+  description: >-
+    Regulatory compliance: EU AI Act, fairness, explainability, lineage, oversight, incidents, transparency
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Compliance
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-compliance-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-credits-api
+  name: Atomadic Tech Credits API
+  description: Credit balance, usage history, and detailed usage breakdown
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Credits
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-credits-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-defi-api
+  name: Atomadic Tech De Fi API
+  description: >-
+    Decentralized finance: LP optimization, risk scoring, oracle guard, liquidation shield, bridge proof,
+    contract audit, yield oracle
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - DeFi
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-defi-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-delegation-api
+  name: Atomadic Tech Delegation API
+  description: UCAN delegation chain validation, revocation, and depth queries
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Delegation
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-delegation-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-drift-api
+  name: Atomadic Tech Drift API
+  description: DriftGuard model drift detection and certification
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Drift
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-drift-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-escrow-api
+  name: Atomadic Tech Escrow API
+  description: 'Agent-to-agent escrow: create, release, dispute, status'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Escrow
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-escrow-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-forge-api
+  name: Atomadic Tech Forge API
+  description: 'Model marketplace: leaderboard, quarantine, verification, delta submission, badges'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Forge
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-forge-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-free-api
+  name: Atomadic Tech Free API
+  description: Endpoints that require no authentication or payment
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Free
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-free-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-identity-api
+  name: Atomadic Tech Identity API
+  description: Agent identity registration, lookup, revocation, and challenges
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Identity
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-identity-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-inference-api
+  name: Atomadic Tech Inference API
+  description: LLM inference with built-in hallucination guard
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Inference
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-inference-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-keys-api
+  name: Atomadic Tech Keys API
+  description: Cryptographic key generation, rotation, and revocation
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-keys-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-lora-api
+  name: Atomadic Tech Lo RA API
+  description: Federated LoRA training coordination and adapter registry
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - LoRA
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-lora-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-oracle-api
+  name: Atomadic Tech Oracle API
+  description: Entropy oracle and hallucination detection
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Oracle
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-oracle-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-payments-api
+  name: Atomadic Tech Payments API
+  description: Stripe payment sessions, price listing, and payment verification
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-payments-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-protocol-api
+  name: Atomadic Tech Protocol API
+  description: 'Protocol discovery endpoints: MCP and A2A agent card'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Protocol
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-protocol-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-rag-api
+  name: Atomadic Tech Rag API
+  description: The Rag API from Atomadic Tech — 1 operation(s) for rag.
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Rag
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-rag-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-reputation-api
+  name: Atomadic Tech Reputation API
+  description: 'Reputation ledger: record interactions, score queries, history'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Reputation
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-reputation-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-security-api
+  name: Atomadic Tech Security API
+  description: RatchetGate session security, identity verification, threat scoring, and compliance
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Security
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-security-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-shield-api
+  name: Atomadic Tech Shield API
+  description: 'AAAA Shield: post-quantum key exchange, session management, key rotation'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Shield
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-shield-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-sla-api
+  name: Atomadic Tech SLA API
+  description: 'SLA management: register, report violations, status checks'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - SLA
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-sla-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-swarm-api
+  name: Atomadic Tech Swarm API
+  description: 'Swarm messaging: relay, broadcast, join, leave, topology, peers'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Swarm
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-swarm-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-text-api
+  name: Atomadic Tech Text API
+  description: 'Text processing utilities: summarization, sentiment, NER, translation, and more'
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Text
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-text-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-trust-api
+  name: Atomadic Tech Trust API
+  description: Bounded trust scoring and trust history (TCM-100-BoundedMonotonicity)
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - Trust
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-trust-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-ucan-api
+  name: Atomadic Tech UCAN API
+  description: UCAN token creation, verification, revocation, and delegation
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - UCAN
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-ucan-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-verirand-api
+  name: Atomadic Tech Veri Rand API
+  description: Premium verifiable random bytes and batch/stream RNG
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - VeriRand
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-verirand-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
+- aid: atomadic-tech:atomadic-tech-vrf-api
+  name: Atomadic Tech VRF API
+  description: Verifiable random function for gaming draws and verification
+  humanURL: https://atomadic.tech/quickstart
+  baseURL: https://mcp.atomadic.tech
+  tags:
+  - VRF
+  properties:
+  - type: OpenAPI
+    url: openapi/atomadic-tech-vrf-api-openapi.yml
+  - type: Documentation
+    url: https://atomadic.tech/quickstart
+  - type: APIReference
+    url: https://atomadic.tech/openapi.json
+  - type: ErrorCatalog
+    url: errors/atomadic-tech-problem-types.yml
+  - type: DataModel
+    url: data-model/atomadic-tech-data-model.yml
+  - type: AgentCard
+    url: a2a/atomadic-tech-a2a.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -178,3 +699,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 46
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://atomadic.tech/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "1.0.0"
+  control: 404

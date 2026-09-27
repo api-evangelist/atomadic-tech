@@ -1,0 +1,841 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Security API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Security across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Security
+  description: RatchetGate session security, identity verification, threat scoring, and compliance
+paths:
+  /v1/ratchet/register:
+    post:
+      operationId: ratchetRegisterSession
+      summary: RatchetGate â€” register session
+      description: Register a new RatchetGate session to mitigate session fixation attacks. Costs $0.002/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  example: sess-001
+      responses:
+        '200':
+          description: Session registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  registered_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: registered
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/advance:
+    post:
+      operationId: ratchetAdvanceSession
+      summary: RatchetGate â€” advance session
+      description: Advance the session ratchet window to trigger re-keying. Costs $0.002/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+                  example: sess-001
+      responses:
+        '200':
+          description: Session advanced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  advanced_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: advanced
+                  window:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/probe:
+    get:
+      operationId: ratchetProbe
+      summary: RatchetGate â€” health probe
+      description: Health probe for a ratchet session. Free endpoint.
+      tags:
+      - Security
+      responses:
+        '200':
+          description: Ratchet probe result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active_sessions:
+                    type: integer
+                  healthy:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/status:
+    get:
+      operationId: ratchetStatus
+      summary: RatchetGate â€” session status
+      description: Check the status of a ratchet session. Costs $0.004/call.
+      tags:
+      - Security
+      parameters:
+      - name: session_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Session identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Session status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - expired
+                    - revoked
+                  window:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  last_advanced:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/revoke:
+    post:
+      operationId: ratchetRevoke
+      summary: RatchetGate â€” revoke session
+      description: Revoke a ratchet session, invalidating all associated keys.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Session revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  revoked_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: revoked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/verify:
+    post:
+      operationId: ratchetVerify
+      summary: RatchetGate â€” verify session integrity
+      description: Verify the integrity of a ratchet session, ensuring no tampering has occurred.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - session_id
+              properties:
+                session_id:
+                  type: string
+      responses:
+        '200':
+          description: Session integrity result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  integrity_valid:
+                    type: boolean
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/list:
+    get:
+      operationId: ratchetList
+      summary: RatchetGate â€” list active sessions
+      description: List all active ratchet sessions. Requires API key.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Active sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        session_id:
+                          type: string
+                        status:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/identity/verify:
+    post:
+      operationId: verifyIdentity
+      summary: Topological identity verification
+      description: Verify agent identity in untrusted networks with Sybil-resistance and a formally proved depth limit. Costs $0.020/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Identity verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  verified:
+                    type: boolean
+                  sybil_resistant:
+                    type: boolean
+                  depth_limit_proved:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/threat/score:
+    post:
+      operationId: scoreThreat
+      summary: Multi-vector threat score
+      description: Compute a multi-vector threat score (velocity, behavioral, and intent) for an agent interaction. Costs $0.003/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                context:
+                  type: string
+                  example: multi-agent-transaction
+      responses:
+        '200':
+          description: Threat score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  threat_score:
+                    type: number
+                    format: float
+                  velocity_score:
+                    type: number
+                    format: float
+                  behavioral_score:
+                    type: number
+                    format: float
+                  intent_score:
+                    type: number
+                    format: float
+                  verdict:
+                    type: string
+                    enum:
+                    - safe
+                    - suspicious
+                    - threat
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/threat/analyze:
+    post:
+      operationId: analyzeThreat
+      summary: Deep threat analysis
+      description: Perform deep threat analysis on an agent or interaction pattern.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                interaction_log:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Threat analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  findings:
+                    type: array
+                    items:
+                      type: object
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/threat/report:
+    post:
+      operationId: reportThreat
+      summary: Report a threat incident
+      description: Report a threat incident involving a specific agent.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - description
+              properties:
+                agent_id:
+                  type: string
+                description:
+                  type: string
+                severity:
+                  type: string
+                  enum:
+                  - low
+                  - medium
+                  - high
+                  - critical
+                evidence:
+                  type: object
+      responses:
+        '200':
+          description: Threat reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/threat/block:
+    post:
+      operationId: blockThreat
+      summary: Block a threatening agent
+      description: Block a threatening agent from further interactions.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                reason:
+                  type: string
+                duration_s:
+                  type: integer
+                  description: Block duration in seconds, 0 for permanent
+      responses:
+        '200':
+          description: Agent blocked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  blocked_at:
+                    type: string
+                    format: date-time
+                  expires_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: blocked
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/threat/history:
+    get:
+      operationId: getThreatHistory
+      summary: Threat history for an agent
+      description: Retrieve the threat history for a specific agent.
+      tags:
+      - Security
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Threat history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        event_type:
+                          type: string
+                        severity:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/check:
+    post:
+      operationId: checkCompliance
+      summary: GDPR/CCPA compliance gate
+      description: Verify regulatory compliance for a data operation with formal proof. Supports GDPR and CCPA jurisdictions. Costs $0.005/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data_type
+              - jurisdiction
+              - operation
+              properties:
+                data_type:
+                  type: string
+                  example: user_pii
+                jurisdiction:
+                  type: string
+                  example: EU
+                operation:
+                  type: string
+                  example: store
+      responses:
+        '200':
+          description: Compliance check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data_type:
+                    type: string
+                  jurisdiction:
+                    type: string
+                  operation:
+                    type: string
+                  compliant:
+                    type: boolean
+                  proof_type:
+                    type: string
+                    example: formal
+                  regulations:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - GDPR
+                    - CCPA
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/security/zero-day:
+    post:
+      operationId: zeroDayAssessment
+      summary: Zero-day threat assessment
+      description: Perform a zero-day threat assessment. Costs $0.04/call.
+      tags:
+      - Security
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target
+              properties:
+                target:
+                  type: string
+                context:
+                  type: object
+      responses:
+        '200':
+          description: Zero-day assessment result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  vulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                  recommendations:
+                    type: array
+                    items:
+                      type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

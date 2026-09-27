@@ -1,0 +1,499 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech De Fi API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged DeFi across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: DeFi
+  description: 'Decentralized finance: LP optimization, risk scoring, oracle guard, liquidation shield, bridge proof, contract audit, yield oracle'
+paths:
+  /v1/defi/optimize:
+    post:
+      operationId: defiOptimize
+      summary: LP parameter optimization (DFP-100-OptimalTick)
+      description: 'Optimize liquidity provider parameters for DeFi positions. Fee: $0.08 + 0.2% of position size.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - protocol
+              - position
+              - risk_tolerance
+              properties:
+                protocol:
+                  type: string
+                  example: uniswap_v3
+                position:
+                  type: object
+                  properties:
+                    token_a:
+                      type: string
+                      example: ETH
+                    token_b:
+                      type: string
+                      example: USDC
+                    amount_usd:
+                      type: number
+                      example: 10000
+                risk_tolerance:
+                  type: number
+                  format: float
+                  example: 0.5
+      responses:
+        '200':
+          description: Optimization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optimal_tick_lower:
+                    type: integer
+                  optimal_tick_upper:
+                    type: integer
+                  expected_apr:
+                    type: number
+                    format: float
+                  impermanent_loss_bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/risk-score:
+    post:
+      operationId: defiRiskScore
+      summary: DeFi risk scoring (DFI-101-RiskScoreBound)
+      description: Compute a risk score for a DeFi position. Costs $0.08/call.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - protocol
+              - position
+              - market_conditions
+              properties:
+                protocol:
+                  type: string
+                position:
+                  type: object
+                market_conditions:
+                  type: object
+      responses:
+        '200':
+          description: Risk score result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_score:
+                    type: number
+                    format: float
+                  risk_level:
+                    type: string
+                    enum:
+                    - low
+                    - medium
+                    - high
+                    - critical
+                  factors:
+                    type: array
+                    items:
+                      type: object
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/oracle-verify:
+    post:
+      operationId: defiOracleVerify
+      summary: Oracle guard (OGD-100-ManipulationBound)
+      description: 'Verify oracle integrity and detect price manipulation. Fee: $0.04 + 0.1% of tvl_at_risk.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - oracle_address
+              - price_feed
+              - reference_price
+              - asset
+              - tvl_at_risk
+              properties:
+                oracle_address:
+                  type: string
+                price_feed:
+                  type: string
+                reference_price:
+                  type: number
+                asset:
+                  type: string
+                tvl_at_risk:
+                  type: number
+      responses:
+        '200':
+          description: Oracle verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  oracle_valid:
+                    type: boolean
+                  deviation:
+                    type: number
+                    format: float
+                  manipulation_bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/liquidation-check:
+    post:
+      operationId: defiLiquidationCheck
+      summary: Liquid Shield (LQS-100-LiquidationBound)
+      description: 'Check liquidation risk for a DeFi position. Fee: $0.04 + 1% of net equity.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - position_id
+              - collateral_value
+              - debt_value
+              - collateral_factor
+              properties:
+                position_id:
+                  type: string
+                collateral_value:
+                  type: number
+                debt_value:
+                  type: number
+                collateral_factor:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Liquidation check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  at_risk:
+                    type: boolean
+                  health_factor:
+                    type: number
+                    format: float
+                  liquidation_price:
+                    type: number
+                  margin_of_safety:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/bridge-verify:
+    post:
+      operationId: defiBridgeVerify
+      summary: Bridge Proof (BRP-100-BridgeIntegrity)
+      description: Verify cross-chain bridge transaction integrity. Costs $0.08/verification.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - bridge_id
+              - source_chain
+              - dest_chain
+              - amount
+              - token
+              properties:
+                bridge_id:
+                  type: string
+                source_chain:
+                  type: string
+                dest_chain:
+                  type: string
+                amount:
+                  type: number
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Bridge verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bridge_valid:
+                    type: boolean
+                  source_confirmed:
+                    type: boolean
+                  dest_confirmed:
+                    type: boolean
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/contract-audit:
+    post:
+      operationId: defiContractAudit
+      summary: Contract Verify (CVR-100-AuditBound)
+      description: Automated smart contract security audit. Costs $0.15/audit.
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - contract_id
+              - contract_type
+              properties:
+                contract_id:
+                  type: string
+                contract_type:
+                  type: string
+                  example: erc20
+      responses:
+        '200':
+          description: Audit result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contract_id:
+                    type: string
+                  audit_passed:
+                    type: boolean
+                  vulnerabilities:
+                    type: array
+                    items:
+                      type: object
+                  risk_score:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/defi/yield-optimize:
+    post:
+      operationId: defiYieldOptimize
+      summary: Yield Oracle (YLD-100-YieldConvergence)
+      description: 'Optimize yield strategy across DeFi protocols. Fee: $0.04 + 2% of alpha.'
+      tags:
+      - DeFi
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - principal_usd
+              - risk_tolerance
+              properties:
+                principal_usd:
+                  type: number
+                  example: 10000
+                risk_tolerance:
+                  type: number
+                  format: float
+                  example: 0.5
+      responses:
+        '200':
+          description: Yield optimization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  strategy:
+                    type: object
+                  expected_apr:
+                    type: number
+                    format: float
+                  risk_adjusted_return:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

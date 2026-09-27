@@ -1,0 +1,858 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Free API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Free across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Free
+  description: Endpoints that require no authentication or payment
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Service health and version
+      description: Returns current service status, version, build date, entropy epoch, and HELIX subsystem flags.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  version:
+                    type: string
+                    example: 0.5.0
+                  build:
+                    type: string
+                    example: '2026-04-08'
+                  epoch:
+                    type: integer
+                    example: 17409216
+                  next_epoch_in_s:
+                    type: integer
+                    example: 45
+                  helix:
+                    $ref: '#/components/schemas/HelixStatus'
+              example:
+                status: ok
+                version: 0.5.0
+                build: '2026-04-08'
+                epoch: 17409216
+                next_epoch_in_s: 45
+                helix:
+                  anti_hallucination: true
+                  ecc_status: true
+                  integrity_parity: true
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /openapi.json:
+    get:
+      operationId: getOpenApiSpec
+      summary: OpenAPI specification
+      description: Returns the full OpenAPI 3.x specification for this API.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: OpenAPI specification document
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/agent.json:
+    get:
+      operationId: getAgentCard
+      summary: A2A agent card
+      description: Returns the Google A2A protocol agent card for agent discovery and capability advertisement.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/mcp.json:
+    get:
+      operationId: getMcpManifest
+      summary: MCP server manifest
+      description: Returns the MCP server manifest for client auto-discovery.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: MCP server manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/ai-plugin.json:
+    get:
+      operationId: getAiPluginManifest
+      summary: OpenAI plugin manifest
+      description: Returns the OpenAI plugin manifest for ChatGPT plugin discovery.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: OpenAI plugin manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/pricing.json:
+    get:
+      operationId: getPricingManifest
+      summary: Machine-readable pricing
+      description: Returns machine-readable pricing for all API endpoints.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Pricing manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/agent-card.json:
+    get:
+      operationId: getAgentCardAlt
+      summary: Alternative A2A agent card path
+      description: Alternative path for the A2A agent card, for compatibility with various A2A client implementations.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/oracle/entropy:
+    get:
+      operationId: getEntropyEpoch
+      summary: Entropy epoch oracle
+      description: Returns the current entropy epoch for zero-RTT A2A handshakes. No authentication required.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Current entropy epoch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  epoch:
+                    type: integer
+                    example: 17409216
+                  entropy:
+                    type: string
+                    example: a3f8c2...
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2026-04-09T12:00:00Z'
+                  source:
+                    type: string
+                    example: quantum_ensemble
+                  verified:
+                    type: boolean
+                    example: true
+              example:
+                epoch: 17409216
+                entropy: a3f8c2...
+                timestamp: '2026-04-09T12:00:00Z'
+                source: quantum_ensemble
+                verified: true
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/rng/quantum:
+    get:
+      operationId: getQuantumRng
+      summary: Quantum random number with proof
+      description: Returns a verifiable quantum random value with cryptographic proof. No authentication required.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Quantum random value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  random:
+                    type: string
+                    example: 0x7f3a8c2e9d1b4a6f...
+                  bits:
+                    type: integer
+                    example: 256
+                  source:
+                    type: string
+                    example: quantum
+                  verified:
+                    type: boolean
+                    example: true
+                  epoch:
+                    type: integer
+                    example: 17409216
+              example:
+                random: 0x7f3a8c2e9d1b4a6f...
+                bits: 256
+                source: quantum
+                verified: true
+                epoch: 17409216
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/rng/verify:
+    get:
+      operationId: verifyRng
+      summary: Verify current epoch random value
+      description: Verify that the current epoch random value is valid and has not been tampered with.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  epoch:
+                    type: integer
+                  valid:
+                    type: boolean
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/register:
+    post:
+      operationId: registerAgent
+      summary: Register an agent
+      description: Register an agent in the swarm topology. Compatible with the Google A2A protocol. No authentication required.
+      tags:
+      - Free
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - capabilities
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - inference
+                  - planning
+                  - code-generation
+      responses:
+        '200':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                    example: my-agent-001
+                  registered_at:
+                    type: string
+                    format: date-time
+                    example: '2026-04-09T14:30:00Z'
+                  status:
+                    type: string
+                    example: active
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - inference
+                    - planning
+              example:
+                agent_id: my-agent-001
+                registered_at: '2026-04-09T14:30:00Z'
+                status: active
+                capabilities:
+                - inference
+                - planning
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/topology:
+    get:
+      operationId: getSwarmTopology
+      summary: Live swarm topology
+      description: Returns live swarm topology statistics for all registered agents. No authentication required.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                    example: 1247
+                  edges:
+                    type: integer
+                    example: 3891
+                  average_degree:
+                    type: number
+                    format: float
+                    example: 3.1
+                  components:
+                    type: integer
+                    example: 5
+                  largest_component_size:
+                    type: integer
+                    example: 1240
+              example:
+                agents: 1247
+                edges: 3891
+                average_degree: 3.1
+                components: 5
+                largest_component_size: 1240
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/discover:
+    get:
+      operationId: discoverAgents
+      summary: Discover agents (A2A compatible)
+      description: Discover available agents in the network. Compatible with Google A2A discovery protocol.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: List of discoverable agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/inbox:
+    get:
+      operationId: pollSwarmInbox
+      summary: Poll swarm inbox
+      description: Poll queued messages for the registered agent. No authentication required.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Queued messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/topology:
+    get:
+      operationId: getSwarmScopedTopology
+      summary: Swarm-scoped topology
+      description: Returns swarm-scoped topology. Same data as /v1/agents/topology but scoped to the swarm group.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                  edges:
+                    type: integer
+                  average_degree:
+                    type: number
+                    format: float
+                  components:
+                    type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/peers:
+    get:
+      operationId: getSwarmPeers
+      summary: List swarm peers
+      description: List all peers in the swarm group.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Swarm peers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  peers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        status:
+                          type: string
+                        joined_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/ratchet/probe:
+    get:
+      operationId: ratchetProbe
+      summary: RatchetGate â€” health probe
+      description: Health probe for a ratchet session. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Ratchet probe result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active_sessions:
+                    type: integer
+                  healthy:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/identity/sybil-check:
+    get:
+      operationId: sybilCheck
+      summary: Sybil-resistance check
+      description: Sybil-resistance check on the calling IP address. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Sybil check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ip:
+                    type: string
+                  sybil_score:
+                    type: number
+                    format: float
+                  suspicious:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/trust/decay:
+    get:
+      operationId: getTrustDecay
+      summary: Current trust ceiling value
+      description: Returns the current trust ceiling value, reflecting the bounded monotonicity decay. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Trust decay value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ceiling:
+                    type: number
+                    format: float
+                  decay_rate:
+                    type: number
+                    format: float
+                  epoch:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/inference/models:
+    get:
+      operationId: listInferenceModels
+      summary: List available inference models
+      description: List all available inference models. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Available models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        context_length:
+                          type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compress:
+    post:
+      operationId: compressData
+      summary: HELIX tensor compression
+      description: Compress data using HELIX tensor compression. Free tier and paid pro tier available.
+      tags:
+      - Free
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data
+              properties:
+                data:
+                  type: string
+                  description: Data to compress
+      responses:
+        '200':
+          description: Compressed output
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compressed:
+                    type: string
+                  original_size:
+                    type: integer
+                  compressed_size:
+                    type: integer
+                  ratio:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/metrics:
+    get:
+      operationId: getMetrics
+      summary: Platform metrics
+      description: 'Returns platform metrics: endpoint count, pricing tiers, uptime. Free endpoint.'
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Platform metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint_count:
+                    type: integer
+                  uptime_percent:
+                    type: number
+                    format: float
+                  total_requests_24h:
+                    type: integer
+                  active_agents:
+                    type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/embed:
+    get:
+      operationId: getHelixManifest
+      summary: HELIX compression service manifest
+      description: Returns the HELIX compression service manifest. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: HELIX manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/bitnet/models:
+    get:
+      operationId: getBitnetModels
+      summary: BitNet/HELIX model catalog
+      description: Returns a catalog of BitNet/HELIX compressed model downloads. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Model catalog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        size_mb:
+                          type: integer
+                        compression:
+                          type: string
+                        download_url:
+                          type: string
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/leaderboard:
+    get:
+      operationId: getForgeLeaderboard
+      summary: Model leaderboard
+      description: Browse the model leaderboard. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Model leaderboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                        rank:
+                          type: integer
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/quarantine:
+    get:
+      operationId: getForgeQuarantine
+      summary: Quarantined models
+      description: View quarantined models that failed verification. Free endpoint.
+      tags:
+      - Free
+      responses:
+        '200':
+          description: Quarantined models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model_id:
+                          type: string
+                        reason:
+                          type: string
+                        quarantined_at:
+                          type: string
+                          format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/forge/badge/{model}:
+    get:
+      operationId: getForgeBadge
+      summary: Model quality badge
+      description: Get a quality badge for a model. Free endpoint.
+      tags:
+      - Free
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Model identifier
+      responses:
+        '200':
+          description: Model badge
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  badge:
+                    type: string
+                    enum:
+                    - gold
+                    - silver
+                    - bronze
+                    - none
+                  score:
+                    type: number
+                    format: float
+                  verified:
+                    type: boolean
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  schemas:
+    HelixStatus:
+      type: object
+      description: HELIX integrity subsystem status
+      properties:
+        anti_hallucination:
+          type: boolean
+        ecc_status:
+          type: boolean
+        integrity_parity:
+          type: boolean
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

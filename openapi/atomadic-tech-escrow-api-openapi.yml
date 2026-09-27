@@ -1,0 +1,286 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Escrow API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Escrow across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Escrow
+  description: 'Agent-to-agent escrow: create, release, dispute, status'
+paths:
+  /v1/escrow/create:
+    post:
+      operationId: createEscrow
+      summary: Create agent-to-agent escrow
+      description: Create an escrow between two agents. Costs $0.04/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - payer_id
+              - payee_id
+              - amount
+              - currency
+              properties:
+                payer_id:
+                  type: string
+                payee_id:
+                  type: string
+                amount:
+                  type: number
+                currency:
+                  type: string
+                conditions:
+                  type: object
+      responses:
+        '200':
+          description: Escrow created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/escrow/release:
+    post:
+      operationId: releaseEscrow
+      summary: Release escrowed funds
+      description: Release escrowed funds to the payee. Costs $0.02/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - escrow_id
+              properties:
+                escrow_id:
+                  type: string
+      responses:
+        '200':
+          description: Escrow released
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    example: released
+                  released_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/escrow/dispute:
+    post:
+      operationId: disputeEscrow
+      summary: Open escrow dispute
+      description: Open a dispute on an escrow. Costs $0.06/call.
+      tags:
+      - Escrow
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - escrow_id
+              - reason
+              properties:
+                escrow_id:
+                  type: string
+                reason:
+                  type: string
+                evidence:
+                  type: object
+      responses:
+        '200':
+          description: Dispute opened
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dispute_id:
+                    type: string
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    example: open
+                  opened_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/escrow/status:
+    get:
+      operationId: getEscrowStatus
+      summary: Escrow status
+      description: Check the status of an escrow. Costs $0.008/call.
+      tags:
+      - Escrow
+      parameters:
+      - name: escrow_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Escrow identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Escrow status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escrow_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - released
+                    - disputed
+                    - refunded
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

@@ -1,0 +1,941 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Agents API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Agents across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Agents
+  description: Agent registration, topology, planning, intent classification, and reputation
+paths:
+  /v1/agents/register:
+    post:
+      operationId: registerAgent
+      summary: Register an agent
+      description: Register an agent in the swarm topology. Compatible with the Google A2A protocol. No authentication required.
+      tags:
+      - Agents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              - capabilities
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - inference
+                  - planning
+                  - code-generation
+      responses:
+        '200':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                    example: my-agent-001
+                  registered_at:
+                    type: string
+                    format: date-time
+                    example: '2026-04-09T14:30:00Z'
+                  status:
+                    type: string
+                    example: active
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - inference
+                    - planning
+              example:
+                agent_id: my-agent-001
+                registered_at: '2026-04-09T14:30:00Z'
+                status: active
+                capabilities:
+                - inference
+                - planning
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/topology:
+    get:
+      operationId: getSwarmTopology
+      summary: Live swarm topology
+      description: Returns live swarm topology statistics for all registered agents. No authentication required.
+      tags:
+      - Agents
+      responses:
+        '200':
+          description: Swarm topology
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: integer
+                    example: 1247
+                  edges:
+                    type: integer
+                    example: 3891
+                  average_degree:
+                    type: number
+                    format: float
+                    example: 3.1
+                  components:
+                    type: integer
+                    example: 5
+                  largest_component_size:
+                    type: integer
+                    example: 1240
+              example:
+                agents: 1247
+                edges: 3891
+                average_degree: 3.1
+                components: 5
+                largest_component_size: 1240
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/status:
+    get:
+      operationId: getAgentStatus
+      summary: Agent status lookup
+      description: Look up the current status of a registered agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - active
+                    - inactive
+                    - suspended
+                  last_seen:
+                    type: string
+                    format: date-time
+                  uptime_s:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/capabilities:
+    get:
+      operationId: getAgentCapabilities
+      summary: List agent capabilities
+      description: List the registered capabilities for a specific agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent capabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  capabilities:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/search:
+    get:
+      operationId: searchAgents
+      summary: Search agents by capability
+      description: Search for agents that provide a specific capability.
+      tags:
+      - Agents
+      parameters:
+      - name: capability
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Capability to search for
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Matching agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/health:
+    get:
+      operationId: getAgentHealth
+      summary: Agent health check
+      description: Check the health status of a specific agent.
+      tags:
+      - Agents
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Agent health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  healthy:
+                    type: boolean
+                  last_heartbeat:
+                    type: string
+                    format: date-time
+                  latency_ms:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/discover:
+    get:
+      operationId: discoverAgents
+      summary: Discover agents (A2A compatible)
+      description: Discover available agents in the network. Compatible with Google A2A discovery protocol.
+      tags:
+      - Agents
+      responses:
+        '200':
+          description: List of discoverable agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        agent_id:
+                          type: string
+                        capabilities:
+                          type: array
+                          items:
+                            type: string
+                        status:
+                          type: string
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/update:
+    post:
+      operationId: updateAgent
+      summary: Update agent capabilities
+      description: Update the capabilities and metadata of a registered agent.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Agent updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/deregister:
+    post:
+      operationId: deregisterAgent
+      summary: Deregister an agent
+      description: Remove an agent from the swarm topology.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Agent deregistered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  deregistered_at:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: deregistered
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/message:
+    post:
+      operationId: messageAgent
+      summary: Send direct message to agent
+      description: Send a direct message to a specific agent in the swarm.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target_agent_id
+              - message
+              properties:
+                target_agent_id:
+                  type: string
+                message:
+                  type: object
+                sender_agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Message delivered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: string
+                  delivered:
+                    type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/negotiate:
+    post:
+      operationId: negotiateAgents
+      summary: Negotiate terms between agents
+      description: Negotiate terms and conditions between two agents for a collaborative task.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - initiator_id
+              - responder_id
+              - terms
+              properties:
+                initiator_id:
+                  type: string
+                responder_id:
+                  type: string
+                terms:
+                  type: object
+      responses:
+        '200':
+          description: Negotiation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  negotiation_id:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - accepted
+                    - rejected
+                    - pending
+                  agreed_terms:
+                    type: object
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/delegate:
+    post:
+      operationId: delegateTask
+      summary: Delegate task to another agent
+      description: Delegate a task to another agent in the swarm network.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from_agent_id
+              - to_agent_id
+              - task
+              properties:
+                from_agent_id:
+                  type: string
+                to_agent_id:
+                  type: string
+                task:
+                  type: object
+      responses:
+        '200':
+          description: Task delegated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delegation_id:
+                    type: string
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/semantic-diff:
+    post:
+      operationId: semanticDiff
+      summary: Semantic diff between agent outputs
+      description: Compute a semantic diff between two agent outputs to identify meaningful differences. Costs $0.04/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - output_a
+              - output_b
+              properties:
+                output_a:
+                  type: string
+                output_b:
+                  type: string
+                context:
+                  type: string
+      responses:
+        '200':
+          description: Semantic diff result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  similarity_score:
+                    type: number
+                    format: float
+                  differences:
+                    type: array
+                    items:
+                      type: object
+                  summary:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/contradiction:
+    post:
+      operationId: detectContradiction
+      summary: Detect contradictions in agent outputs
+      description: Detect logical contradictions between agent outputs. Costs $0.02/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - statements
+              properties:
+                statements:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - The model accuracy is 95%
+                  - The model fails 20% of the time
+      responses:
+        '200':
+          description: Contradiction detection result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contradictions_found:
+                    type: boolean
+                  contradictions:
+                    type: array
+                    items:
+                      type: object
+                  confidence:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/swarm/inbox:
+    get:
+      operationId: pollSwarmInbox
+      summary: Poll swarm inbox
+      description: Poll queued messages for the registered agent. No authentication required.
+      tags:
+      - Agents
+      responses:
+        '200':
+          description: Queued messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/plan:
+    post:
+      operationId: planAgentGoal
+      summary: Autonomous agent goal planning
+      description: Decompose a goal into an action plan for autonomous agent execution. Costs $0.015/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - goal
+              properties:
+                goal:
+                  type: string
+                  example: Deploy a web service with zero downtime
+                constraints:
+                  type: object
+                  description: Optional constraints for the plan (e.g., time limits, resource caps)
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Goal decomposition and action plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  goal:
+                    type: string
+                  steps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        step:
+                          type: integer
+                        action:
+                          type: string
+                        description:
+                          type: string
+                  estimated_complexity:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/intent-classify:
+    post:
+      operationId: classifyAgentIntent
+      summary: Agent intent classification
+      description: Classify agent intent from natural language text. Returns the top-3 intent classifications. Costs $0.005/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: I need to fetch user data and store it in the database
+      responses:
+        '200':
+          description: Top-3 intent classifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  intents:
+                    type: array
+                    maxItems: 3
+                    items:
+                      type: object
+                      properties:
+                        intent:
+                          type: string
+                        confidence:
+                          type: number
+                          format: float
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/agents/reputation:
+    post:
+      operationId: getAgentReputation
+      summary: Agent reputation and trust score
+      description: Get the A2A trust score and compliance status for an agent. Costs $0.010/call.
+      tags:
+      - Agents
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+                  example: my-agent-001
+      responses:
+        '200':
+          description: Agent reputation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  trust_score:
+                    type: number
+                    format: float
+                  compliance_status:
+                    type: string
+                    enum:
+                    - compliant
+                    - non_compliant
+                    - unknown
+                  interactions:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

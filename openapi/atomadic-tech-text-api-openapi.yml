@@ -1,0 +1,666 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Text API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Text across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Text
+  description: 'Text processing utilities: summarization, sentiment, NER, translation, and more'
+paths:
+  /v1/text/summarize:
+    post:
+      operationId: summarizeText
+      summary: Text summarization
+      description: Generate an extractive summary of the provided text. Costs $0.010/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: Formal verification is the act of proving or disproving the correctness of intended algorithms underlying a system with respect to a certain formal specification or property, using formal methods of mathematics.
+      responses:
+        '200':
+          description: Extractive summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: string
+                  original_length:
+                    type: integer
+                  summary_length:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/sentiment:
+    post:
+      operationId: analyzeSentiment
+      summary: Sentiment analysis
+      description: Classify the sentiment of the provided text. Costs $0.005/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  example: This API is incredibly reliable and easy to use.
+      responses:
+        '200':
+          description: Sentiment classification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sentiment:
+                    type: string
+                    enum:
+                    - positive
+                    - negative
+                    - neutral
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+                    properties:
+                      positive:
+                        type: number
+                        format: float
+                      negative:
+                        type: number
+                        format: float
+                      neutral:
+                        type: number
+                        format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/ner:
+    post:
+      operationId: textNer
+      summary: Named entity recognition
+      description: Extract named entities from text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Named entities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                        label:
+                          type: string
+                        start:
+                          type: integer
+                        end:
+                          type: integer
+                        confidence:
+                          type: number
+                          format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/translate:
+    post:
+      operationId: textTranslate
+      summary: Text translation
+      description: Translate text to a target language. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              - target_language
+              properties:
+                text:
+                  type: string
+                target_language:
+                  type: string
+                  example: es
+                source_language:
+                  type: string
+                  example: en
+      responses:
+        '200':
+          description: Translation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  translated_text:
+                    type: string
+                  source_language:
+                    type: string
+                  target_language:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/classify:
+    post:
+      operationId: textClassify
+      summary: Text classification
+      description: Classify text into predefined or custom categories. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  confidence:
+                    type: number
+                    format: float
+                  scores:
+                    type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/embed:
+    post:
+      operationId: textEmbed
+      summary: Text embeddings
+      description: Generate text embeddings for semantic similarity and search. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Embedding result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  embedding:
+                    type: array
+                    items:
+                      type: number
+                  dimensions:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/keywords:
+    post:
+      operationId: textKeywords
+      summary: Keyword extraction
+      description: Extract keywords and key phrases from text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                max_keywords:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Keywords
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keywords:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        keyword:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/similarity:
+    post:
+      operationId: textSimilarity
+      summary: Text similarity scoring
+      description: Compute semantic similarity between two texts. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text_a
+              - text_b
+              properties:
+                text_a:
+                  type: string
+                text_b:
+                  type: string
+      responses:
+        '200':
+          description: Similarity result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  similarity:
+                    type: number
+                    format: float
+                  method:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/rewrite:
+    post:
+      operationId: textRewrite
+      summary: Text rewriting
+      description: Rewrite text in a different style or tone. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                style:
+                  type: string
+                  example: formal
+      responses:
+        '200':
+          description: Rewritten text
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rewritten_text:
+                    type: string
+                  style:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/extract:
+    post:
+      operationId: textExtract
+      summary: Structured data extraction
+      description: Extract structured data from unstructured text. Costs $0.02/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                schema:
+                  type: object
+                  description: Expected output schema
+      responses:
+        '200':
+          description: Extracted structured data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  extracted:
+                    type: object
+                  confidence:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/detect-language:
+    post:
+      operationId: textDetectLanguage
+      summary: Language detection
+      description: Detect the language of the provided text. Costs $0.01/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Language detection result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    type: string
+                    example: en
+                  confidence:
+                    type: number
+                    format: float
+                  alternatives:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/text/tokenize:
+    post:
+      operationId: textTokenize
+      summary: Tokenization
+      description: Tokenize text into tokens. Costs $0.01/call.
+      tags:
+      - Text
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Tokenization result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    type: array
+                    items:
+                      type: string
+                  token_count:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

@@ -1,0 +1,210 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Trust API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Trust across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Trust
+  description: Bounded trust scoring and trust history (TCM-100-BoundedMonotonicity)
+paths:
+  /v1/trust/decay:
+    get:
+      operationId: getTrustDecay
+      summary: Current trust ceiling value
+      description: Returns the current trust ceiling value, reflecting the bounded monotonicity decay. Free endpoint.
+      tags:
+      - Trust
+      responses:
+        '200':
+          description: Trust decay value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ceiling:
+                    type: number
+                    format: float
+                  decay_rate:
+                    type: number
+                    format: float
+                  epoch:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/trust/score:
+    post:
+      operationId: getTrustScore
+      summary: Bounded trust score
+      description: Compute a bounded trust score for on-chain governance (TCM-100-BoundedMonotonicity). Costs $0.04/call.
+      tags:
+      - Trust
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - agent_id
+              properties:
+                agent_id:
+                  type: string
+      responses:
+        '200':
+          description: Trust score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  trust_score:
+                    type: number
+                    format: float
+                  bounded:
+                    type: boolean
+                  ceiling:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/trust/history:
+    get:
+      operationId: getTrustHistory
+      summary: Trust score history
+      description: Retrieve trust score history for an agent. Costs $0.04/query.
+      tags:
+      - Trust
+      parameters:
+      - name: agent_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Agent identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Trust score history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent_id:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        trust_score:
+                          type: number
+                          format: float
+                        timestamp:
+                          type: string
+                          format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

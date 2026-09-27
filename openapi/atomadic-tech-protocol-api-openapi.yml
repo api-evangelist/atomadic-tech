@@ -1,0 +1,185 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Protocol API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Protocol across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Protocol
+  description: 'Protocol discovery endpoints: MCP and A2A agent card'
+paths:
+  /.well-known/agent.json:
+    get:
+      operationId: getAgentCard
+      summary: A2A agent card
+      description: Returns the Google A2A protocol agent card for agent discovery and capability advertisement.
+      tags:
+      - Protocol
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/mcp.json:
+    get:
+      operationId: getMcpManifest
+      summary: MCP server manifest
+      description: Returns the MCP server manifest for client auto-discovery.
+      tags:
+      - Protocol
+      responses:
+        '200':
+          description: MCP server manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/ai-plugin.json:
+    get:
+      operationId: getAiPluginManifest
+      summary: OpenAI plugin manifest
+      description: Returns the OpenAI plugin manifest for ChatGPT plugin discovery.
+      tags:
+      - Protocol
+      responses:
+        '200':
+          description: OpenAI plugin manifest
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /.well-known/agent-card.json:
+    get:
+      operationId: getAgentCardAlt
+      summary: Alternative A2A agent card path
+      description: Alternative path for the A2A agent card, for compatibility with various A2A client implementations.
+      tags:
+      - Protocol
+      responses:
+        '200':
+          description: A2A agent card
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /mcp:
+    post:
+      operationId: mcpEndpoint
+      summary: MCP server endpoint
+      description: 'Model Context Protocol (MCP) endpoint. Available tools: health, metrics, oracle_entropy, oracle_hallucination, ratchetgate_session, ratchetgate_register, ratchetgate_advance, inference, inference_stream.'
+      tags:
+      - Protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: MCP response
+          content:
+            application/json:
+              schema:
+                type: object
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /a2a:
+    post:
+      operationId: a2aEndpoint
+      summary: A2A agent-to-agent endpoint
+      description: 'Google Agent-to-Agent (A2A) protocol endpoint. Supports methods: message/send, tasks/get.'
+      tags:
+      - Protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - jsonrpc
+              - method
+              - id
+              properties:
+                jsonrpc:
+                  type: string
+                  enum:
+                  - '2.0'
+                method:
+                  type: string
+                  enum:
+                  - message/send
+                  - tasks/get
+                params:
+                  type: object
+                id:
+                  type: string
+            example:
+              jsonrpc: '2.0'
+              method: message/send
+              params:
+                message:
+                  role: user
+                  parts:
+                  - type: text
+                    text: Check health
+              id: '1'
+      responses:
+        '200':
+          description: A2A JSON-RPC response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                  result:
+                    type: object
+                  id:
+                    type: string
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml

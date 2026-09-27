@@ -1,0 +1,638 @@
+openapi: 3.2.0
+info:
+  title: Atomadic Tech Compliance API
+  version: 0.5.1
+  contact:
+    email: atomadic69@gmail.com
+    url: https://github.com/atomadictech/aaaa-nexus
+  description: 'Operations tagged Compliance across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://atomadic.tech
+  description: Production
+security: []
+tags:
+- name: Compliance
+  description: 'Regulatory compliance: EU AI Act, fairness, explainability, lineage, oversight, incidents, transparency'
+paths:
+  /v1/compliance/check:
+    post:
+      operationId: checkCompliance
+      summary: GDPR/CCPA compliance gate
+      description: Verify regulatory compliance for a data operation with formal proof. Supports GDPR and CCPA jurisdictions. Costs $0.005/call.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - data_type
+              - jurisdiction
+              - operation
+              properties:
+                data_type:
+                  type: string
+                  example: user_pii
+                jurisdiction:
+                  type: string
+                  example: EU
+                operation:
+                  type: string
+                  example: store
+      responses:
+        '200':
+          description: Compliance check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data_type:
+                    type: string
+                  jurisdiction:
+                    type: string
+                  operation:
+                    type: string
+                  compliant:
+                    type: boolean
+                  proof_type:
+                    type: string
+                    example: formal
+                  regulations:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - GDPR
+                    - CCPA
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/eu-ai-act:
+    post:
+      operationId: euAiActCertificate
+      summary: EU AI Act compliance certificate
+      description: Generate an EU AI Act compliance certificate for an AI system. Costs $0.04/check.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - risk_category
+              - intended_purpose
+              properties:
+                system_id:
+                  type: string
+                risk_category:
+                  type: string
+                  enum:
+                  - minimal
+                  - limited
+                  - high
+                  - unacceptable
+                intended_purpose:
+                  type: string
+      responses:
+        '200':
+          description: EU AI Act certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  system_id:
+                    type: string
+                  compliant:
+                    type: boolean
+                  risk_category:
+                    type: string
+                  requirements:
+                    type: array
+                    items:
+                      type: object
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/fairness:
+    post:
+      operationId: fairnessProof
+      summary: Fairness proof (FNS-100-FairnessBound)
+      description: Generate a fairness proof certificate for a model. Costs $0.04/check.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - dataset_id
+              - protected_attrs
+              - metric
+              properties:
+                model_id:
+                  type: string
+                dataset_id:
+                  type: string
+                protected_attrs:
+                  type: array
+                  items:
+                    type: string
+                metric:
+                  type: string
+                  example: demographic_parity
+      responses:
+        '200':
+          description: Fairness proof certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  model_id:
+                    type: string
+                  fair:
+                    type: boolean
+                  metric_value:
+                    type: number
+                    format: float
+                  bound:
+                    type: number
+                    format: float
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/explain:
+    post:
+      operationId: explainabilityCertificate
+      summary: Explainability certificate (XPL-100-ExplainBound)
+      description: Generate an explainability certificate for a model decision. Costs $0.04/call.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - decision_id
+              - subject_context
+              properties:
+                model_id:
+                  type: string
+                decision_id:
+                  type: string
+                subject_context:
+                  type: object
+      responses:
+        '200':
+          description: Explainability certificate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  certificate_id:
+                    type: string
+                  explanation:
+                    type: string
+                  features:
+                    type: array
+                    items:
+                      type: object
+                  explainability_score:
+                    type: number
+                    format: float
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/lineage:
+    post:
+      operationId: dataLineage
+      summary: Data lineage (LIN-100-ChainIntegrity)
+      description: Verify data lineage chain integrity. Costs $0.04/call.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - dataset_stages
+              properties:
+                model_id:
+                  type: string
+                dataset_stages:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Data lineage verification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  chain_valid:
+                    type: boolean
+                  stages_verified:
+                    type: integer
+                  proof:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/oversight:
+    post:
+      operationId: logOversight
+      summary: Log oversight event
+      description: Log a human oversight event for an AI system. Costs $0.02/event.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - reviewer_id
+              - decision
+              - notes
+              properties:
+                system_id:
+                  type: string
+                reviewer_id:
+                  type: string
+                decision:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Oversight event logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id:
+                    type: string
+                  system_id:
+                    type: string
+                  logged_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/oversight/history:
+    get:
+      operationId: getOversightHistory
+      summary: Oversight history
+      description: Retrieve oversight event history for a system. Costs $0.02/query.
+      tags:
+      - Compliance
+      parameters:
+      - name: system_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: System identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Oversight history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  system_id:
+                    type: string
+                  events:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/incident:
+    post:
+      operationId: reportIncident
+      summary: Report compliance incident
+      description: Report an AI system compliance incident. Costs $0.02/report.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - severity
+              - description
+              - affected_users
+              properties:
+                system_id:
+                  type: string
+                severity:
+                  type: string
+                  enum:
+                  - low
+                  - medium
+                  - high
+                  - critical
+                description:
+                  type: string
+                affected_users:
+                  type: integer
+      responses:
+        '200':
+          description: Incident reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  incident_id:
+                    type: string
+                  system_id:
+                    type: string
+                  status:
+                    type: string
+                  reported_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/incidents:
+    get:
+      operationId: getIncidents
+      summary: Incident registry
+      description: Retrieve the incident registry for a system. Costs $0.02/query.
+      tags:
+      - Compliance
+      parameters:
+      - name: system_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: System identifier
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      responses:
+        '200':
+          description: Incident registry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  system_id:
+                    type: string
+                  incidents:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+  /v1/compliance/transparency:
+    post:
+      operationId: transparencyReport
+      summary: Transparency report
+      description: Generate a transparency report for an AI system. Costs $0.08/report.
+      tags:
+      - Compliance
+      security:
+      - ApiKeyAuth: []
+      - X402PaymentProof: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - system_id
+              - period
+              - include
+              properties:
+                system_id:
+                  type: string
+                period:
+                  type: string
+                  example: 2026-Q1
+                include:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - incidents
+                  - oversight
+                  - fairness
+      responses:
+        '200':
+          description: Transparency report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                  system_id:
+                    type: string
+                  period:
+                    type: string
+                  sections:
+                    type: object
+                  generated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+    servers:
+    - url: https://atomadic.tech
+      description: Production
+components:
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    PaymentRequired:
+      description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Payment required
+              amount:
+                type: string
+                example: '0.002'
+              currency:
+                type: string
+                example: USDC
+              treasury:
+                type: string
+                description: Destination wallet address
+              chains:
+                type: array
+                items:
+                  type: string
+                example:
+                - base
+                - polygon
+                - solana
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key obtained from https://atomadic.tech/pay
+    X402PaymentProof:
+      type: apiKey
+      in: header
+      name: X-Payment-Proof
+      description: Base64-encoded USDC payment proof for x402 autonomous payment flow (Base L2, Polygon, or Solana)
+    AdminTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Admin token for privileged operations
+x-refined-from:
+- atomadic-tech-openapi.json
+- atomadic-tech-openapi.yml
