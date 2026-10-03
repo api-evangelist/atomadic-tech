@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Atomadic Tech Oracle API
+  title: AAAA Nexus Oracle API
   version: 0.5.1
+  description: Formally verified AI safety APIs for autonomous agents. Supports REST, MCP, A2A (Google protocol), and x402 micropayment protocol.
   contact:
     email: atomadic69@gmail.com
     url: https://github.com/atomadictech/aaaa-nexus
-  description: 'Operations tagged Oracle across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://atomadic.tech
   description: Production
@@ -51,9 +51,6 @@ paths:
                 timestamp: '2026-04-09T12:00:00Z'
                 source: quantum_ensemble
                 verified: true
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/rng/quantum:
     get:
       operationId: getQuantumRng
@@ -90,9 +87,6 @@ paths:
                 source: quantum
                 verified: true
                 epoch: 17409216
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/rng/verify:
     get:
       operationId: verifyRng
@@ -117,9 +111,6 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/oracle/hallucination:
     post:
       operationId: detectHallucination
@@ -183,20 +174,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
 components:
   responses:
-    BadRequest:
-      description: Invalid request body or missing required fields.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
     Unauthorized:
       description: Missing or invalid API key.
       content:
@@ -207,6 +186,15 @@ components:
               error:
                 type: string
                 example: Unauthorized
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
     PaymentRequired:
       description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
       content:
@@ -250,6 +238,3 @@ components:
       in: header
       name: X-Admin-Token
       description: Admin token for privileged operations
-x-refined-from:
-- atomadic-tech-openapi.json
-- atomadic-tech-openapi.yml

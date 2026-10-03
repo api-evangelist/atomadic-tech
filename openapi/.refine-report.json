@@ -1,8 +1,7 @@
 {
   "provider": "atomadic-tech",
   "sources": [
-    "_original/atomadic-tech-openapi.json",
-    "atomadic-tech-openapi.yml"
+    "_original/atomadic-tech-openapi.json"
   ],
   "outputs": [
     "atomadic-tech-agents-api-openapi.yml",
@@ -34,48 +33,46 @@
     "atomadic-tech-vrf-api-openapi.yml",
     "atomadic-tech-verirand-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/atomadic-tech-openapi.yml"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "atomadic-tech-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "atomadic-tech-openapi.json: tagged paths POST /v1/rag/augment -> Rag",
     "atomadic-tech-openapi.json: declared missing tag: Rag",
-    "atomadic-tech-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "atomadic-tech-openapi.yml: tagged paths POST /v1/rag/augment -> Rag",
-    "atomadic-tech-openapi.yml: declared missing tag: Rag",
-    "tag 'Agents' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Audit' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Compliance' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Credits' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'DeFi' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Delegation' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Drift' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Escrow' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Forge' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Free' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Identity' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Inference' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Keys' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'LoRA' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Oracle' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Payments' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Protocol' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Rag' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Reputation' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'SLA' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Security' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Shield' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Swarm' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Text' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'Trust' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'UCAN' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'VRF' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "tag 'VeriRand' spans 2 source specs (atomadic-tech-openapi.json, atomadic-tech-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+28 apis, 29 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/atomadic-tech-openapi.yml: archived document superseded by a larger archived document",
+    "atomadic-tech-agents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-audit-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-compliance-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-credits-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-defi-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-delegation-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-drift-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-escrow-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-forge-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-free-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-identity-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-inference-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-keys-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-lora-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-oracle-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-payments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-protocol-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-rag-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-reputation-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-security-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-shield-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-sla-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-swarm-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-text-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-trust-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-ucan-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-verirand-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "atomadic-tech-vrf-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

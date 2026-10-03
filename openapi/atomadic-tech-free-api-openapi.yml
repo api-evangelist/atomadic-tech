@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Atomadic Tech Free API
+  title: AAAA Nexus Free API
   version: 0.5.1
+  description: Formally verified AI safety APIs for autonomous agents. Supports REST, MCP, A2A (Google protocol), and x402 micropayment protocol.
   contact:
     email: atomadic69@gmail.com
     url: https://github.com/atomadictech/aaaa-nexus
-  description: 'Operations tagged Free across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://atomadic.tech
   description: Production
@@ -56,9 +56,6 @@ paths:
                   anti_hallucination: true
                   ecc_status: true
                   integrity_parity: true
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /openapi.json:
     get:
       operationId: getOpenApiSpec
@@ -73,9 +70,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /.well-known/agent.json:
     get:
       operationId: getAgentCard
@@ -90,9 +84,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /.well-known/mcp.json:
     get:
       operationId: getMcpManifest
@@ -107,9 +98,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /.well-known/ai-plugin.json:
     get:
       operationId: getAiPluginManifest
@@ -124,9 +112,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /.well-known/pricing.json:
     get:
       operationId: getPricingManifest
@@ -141,9 +126,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /.well-known/agent-card.json:
     get:
       operationId: getAgentCardAlt
@@ -158,9 +140,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/oracle/entropy:
     get:
       operationId: getEntropyEpoch
@@ -198,9 +177,6 @@ paths:
                 timestamp: '2026-04-09T12:00:00Z'
                 source: quantum_ensemble
                 verified: true
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/rng/quantum:
     get:
       operationId: getQuantumRng
@@ -237,9 +213,6 @@ paths:
                 source: quantum
                 verified: true
                 epoch: 17409216
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/rng/verify:
     get:
       operationId: verifyRng
@@ -264,9 +237,6 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/agents/register:
     post:
       operationId: registerAgent
@@ -329,9 +299,6 @@ paths:
                 - planning
         '400':
           $ref: '#/components/responses/BadRequest'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/agents/topology:
     get:
       operationId: getSwarmTopology
@@ -369,9 +336,6 @@ paths:
                 average_degree: 3.1
                 components: 5
                 largest_component_size: 1240
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/agents/discover:
     get:
       operationId: discoverAgents
@@ -400,9 +364,6 @@ paths:
                             type: string
                         status:
                           type: string
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/swarm/inbox:
     get:
       operationId: pollSwarmInbox
@@ -419,9 +380,6 @@ paths:
                 type: array
                 items:
                   type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/swarm/topology:
     get:
       operationId: getSwarmScopedTopology
@@ -446,9 +404,6 @@ paths:
                     format: float
                   components:
                     type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/swarm/peers:
     get:
       operationId: getSwarmPeers
@@ -478,9 +433,6 @@ paths:
                           format: date-time
                   total:
                     type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/ratchet/probe:
     get:
       operationId: ratchetProbe
@@ -503,9 +455,6 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/identity/sybil-check:
     get:
       operationId: sybilCheck
@@ -531,9 +480,6 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/trust/decay:
     get:
       operationId: getTrustDecay
@@ -560,9 +506,6 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/inference/models:
     get:
       operationId: listInferenceModels
@@ -591,9 +534,6 @@ paths:
                           type: string
                         context_length:
                           type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/compress:
     post:
       operationId: compressData
@@ -634,9 +574,6 @@ paths:
                     format: float
         '400':
           $ref: '#/components/responses/BadRequest'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/metrics:
     get:
       operationId: getMetrics
@@ -661,9 +598,6 @@ paths:
                     type: integer
                   active_agents:
                     type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/embed:
     get:
       operationId: getHelixManifest
@@ -678,9 +612,6 @@ paths:
             application/json:
               schema:
                 type: object
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/bitnet/models:
     get:
       operationId: getBitnetModels
@@ -711,9 +642,6 @@ paths:
                           type: string
                         download_url:
                           type: string
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/leaderboard:
     get:
       operationId: getForgeLeaderboard
@@ -743,9 +671,6 @@ paths:
                           format: float
                         rank:
                           type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/quarantine:
     get:
       operationId: getForgeQuarantine
@@ -773,9 +698,6 @@ paths:
                         quarantined_at:
                           type: string
                           format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/badge/{model}:
     get:
       operationId: getForgeBadge
@@ -812,20 +734,7 @@ paths:
                     format: float
                   verified:
                     type: boolean
-    servers:
-    - url: https://atomadic.tech
-      description: Production
 components:
-  responses:
-    BadRequest:
-      description: Invalid request body or missing required fields.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
   schemas:
     HelixStatus:
       type: object
@@ -837,6 +746,16 @@ components:
           type: boolean
         integrity_parity:
           type: boolean
+  responses:
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -853,6 +772,3 @@ components:
       in: header
       name: X-Admin-Token
       description: Admin token for privileged operations
-x-refined-from:
-- atomadic-tech-openapi.json
-- atomadic-tech-openapi.yml

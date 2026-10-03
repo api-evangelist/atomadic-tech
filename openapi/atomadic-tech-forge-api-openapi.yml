@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Atomadic Tech Forge API
+  title: AAAA Nexus Forge API
   version: 0.5.1
+  description: Formally verified AI safety APIs for autonomous agents. Supports REST, MCP, A2A (Google protocol), and x402 micropayment protocol.
   contact:
     email: atomadic69@gmail.com
     url: https://github.com/atomadictech/aaaa-nexus
-  description: 'Operations tagged Forge across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://atomadic.tech
   description: Production
@@ -43,9 +43,6 @@ paths:
                           format: float
                         rank:
                           type: integer
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/quarantine:
     get:
       operationId: getForgeQuarantine
@@ -73,9 +70,6 @@ paths:
                         quarantined_at:
                           type: string
                           format: date-time
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/verify:
     post:
       operationId: verifyForgeModel
@@ -121,9 +115,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/delta/submit:
     post:
       operationId: submitForgeDelta
@@ -170,9 +161,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/forge/badge/{model}:
     get:
       operationId: getForgeBadge
@@ -209,20 +197,8 @@ paths:
                     format: float
                   verified:
                     type: boolean
-    servers:
-    - url: https://atomadic.tech
-      description: Production
 components:
   responses:
-    BadRequest:
-      description: Invalid request body or missing required fields.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
     Unauthorized:
       description: Missing or invalid API key.
       content:
@@ -233,6 +209,15 @@ components:
               error:
                 type: string
                 example: Unauthorized
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -249,6 +234,3 @@ components:
       in: header
       name: X-Admin-Token
       description: Admin token for privileged operations
-x-refined-from:
-- atomadic-tech-openapi.json
-- atomadic-tech-openapi.yml

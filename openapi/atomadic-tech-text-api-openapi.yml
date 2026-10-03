@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Atomadic Tech Text API
+  title: AAAA Nexus Text API
   version: 0.5.1
+  description: Formally verified AI safety APIs for autonomous agents. Supports REST, MCP, A2A (Google protocol), and x402 micropayment protocol.
   contact:
     email: atomadic69@gmail.com
     url: https://github.com/atomadictech/aaaa-nexus
-  description: 'Operations tagged Text across 2 of this provider''s published API definitions: atomadic-tech-openapi.json, atomadic-tech-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://atomadic.tech
   description: Production
@@ -56,9 +56,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/sentiment:
     post:
       operationId: analyzeSentiment
@@ -116,9 +113,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/ner:
     post:
       operationId: textNer
@@ -170,9 +164,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/translate:
     post:
       operationId: textTranslate
@@ -221,9 +212,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/classify:
     post:
       operationId: textClassify
@@ -270,9 +258,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/embed:
     post:
       operationId: textEmbed
@@ -314,9 +299,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/keywords:
     post:
       operationId: textKeywords
@@ -365,9 +347,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/similarity:
     post:
       operationId: textSimilarity
@@ -411,9 +390,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/rewrite:
     post:
       operationId: textRewrite
@@ -456,9 +432,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/extract:
     post:
       operationId: textExtract
@@ -502,9 +475,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/detect-language:
     post:
       operationId: textDetectLanguage
@@ -550,9 +520,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
   /v1/text/tokenize:
     post:
       operationId: textTokenize
@@ -594,20 +561,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '402':
           $ref: '#/components/responses/PaymentRequired'
-    servers:
-    - url: https://atomadic.tech
-      description: Production
 components:
   responses:
-    BadRequest:
-      description: Invalid request body or missing required fields.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
     Unauthorized:
       description: Missing or invalid API key.
       content:
@@ -618,6 +573,15 @@ components:
               error:
                 type: string
                 example: Unauthorized
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
     PaymentRequired:
       description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
       content:
@@ -661,6 +625,3 @@ components:
       in: header
       name: X-Admin-Token
       description: Admin token for privileged operations
-x-refined-from:
-- atomadic-tech-openapi.json
-- atomadic-tech-openapi.yml
