@@ -211,25 +211,6 @@ paths:
           $ref: '#/components/responses/PaymentRequired'
 components:
   responses:
-    Unauthorized:
-      description: Missing or invalid API key.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-                example: Unauthorized
-    BadRequest:
-      description: Invalid request body or missing required fields.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
     PaymentRequired:
       description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
       content:
@@ -257,6 +238,25 @@ components:
                 - base
                 - polygon
                 - solana
+    BadRequest:
+      description: Invalid request body or missing required fields.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
