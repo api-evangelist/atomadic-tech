@@ -124,6 +124,8 @@ apis:
   humanURL: https://atomadic.tech/quickstart
   baseURL: https://mcp.atomadic.tech
   tags:
+  - Credit
+  tags_raw:
   - Credits
   properties:
   - type: OpenAPI
@@ -406,6 +408,8 @@ apis:
   humanURL: https://atomadic.tech/quickstart
   baseURL: https://mcp.atomadic.tech
   tags:
+  - RAG
+  tags_raw:
   - Rag
   properties:
   - type: OpenAPI
@@ -626,6 +630,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/atomadic-tech-capability-edges.yml
+  name: Atomadic Tech Business Capability Map
 - type: Website
   url: https://atomadic.tech/
 - type: DeveloperPortal
