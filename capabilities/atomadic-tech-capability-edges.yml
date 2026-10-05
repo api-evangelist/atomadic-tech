@@ -1,0 +1,65 @@
+slug: atomadic-tech
+provider: Atomadic Tech
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Security
+  spec_file: atomadic-tech-security-api-openapi.yml
+  capability_id: BC-620.30
+  capability_id_l1: BC-620
+  capability_name: Threat Detection & Response Management
+  confidence: 0.85
+  evidence: POST /v1/threat/score  Multi-vector threat score; POST /v1/threat/analyze  Deep threat analysis;
+    POST /v1/threat/report  Report a threat incident; POST /v1/threat/block  Block a threatening agent
+  reason: Threat scoring, deep analysis, incident reporting and blocking of hostile actors is squarely
+    threat detection and response; the RatchetGate session and identity-verification operations reinforce
+    the security-operations reading.
+- tag: Identity
+  spec_file: atomadic-tech-identity-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.8
+  evidence: POST /v1/identity/register  registerIdentity  Register agent identity; POST /v1/identity/revoke  revokeIdentity  Revoke
+    agent identity; GET /v1/identity/sybil-check
+  reason: Registration, verification, challenge and revocation of agent identities is identity and access
+    management for non-human principals.
+- tag: Inference
+  spec_file: atomadic-tech-inference-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.75
+  evidence: POST /v1/inference  chatInference  Chat inference with hallucination guard; GET /v1/inference/models  listInferenceModels
+  reason: LLM inference, embeddings, classification and model listing — operational AI/ML serving, which
+    falls under Artificial Intelligence Management.
+- tag: Compliance
+  spec_file: atomadic-tech-compliance-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: POST /v1/compliance/eu-ai-act  euAiActCertificate  EU AI Act compliance certificate; POST
+    /v1/compliance/check  GDPR/CCPA compliance gate
+  reason: Operations produce regulatory compliance certificates and attestations against named regulations
+    (EU AI Act, GDPR/CCPA) plus incident registry and transparency reporting — regulatory compliance management.
+    Some overlap with privacy (BC-130.50) and responsible AI, hence 0.7.
+- tag: Delegation
+  spec_file: atomadic-tech-delegation-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.7
+  evidence: POST /v1/delegation/validate  validateDelegation  Validate UCAN delegation chain; POST /v1/delegation/revoke  revokeDelegation
+  reason: UCAN capability-delegation chains, revocation and depth checks are authorisation/access-delegation
+    mechanics — identity and access management. Not corporate delegation of authority.
