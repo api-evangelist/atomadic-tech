@@ -100,3 +100,84 @@ price_consistency_note: >-
   on the status page and 100000 micro-USDC in the manifest; /v1/ratchet/register is $0.002 in the
   spec description and 20000 micro-USDC ($0.020) in the manifest. The manifest and the live
   X-Price-Micro-USDC header agree with each other; treat them as authoritative.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - hybrid
+  - metered
+  - subscription
+  units: []
+  plans:
+  - name: Pay-per-call (x402)
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
+  - name: Dev credit pack
+    access: other
+    model: hybrid
+    model_how: derived
+    units: []
+    periods: []
+  - name: Pro credit pack
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Enterprise credit pack
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Compliance & Trust suite
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Agent & DeFi Ops suite
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Intelligence suite
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Fuse Pro
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Fuse Team
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Complete — All-Access
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Founding Operator Key
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Enterprise compliance (three tiers)
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
