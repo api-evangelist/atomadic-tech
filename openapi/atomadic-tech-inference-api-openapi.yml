@@ -270,6 +270,23 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 components:
+  schemas:
+    ChatMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          description: Message role
+        content:
+          type: string
+          description: Message content
   responses:
     PaymentRequired:
       description: 'Payment required. Use x402 protocol: send USDC on Base L2, Polygon, or Solana to the treasury address provided in the response, then retry with the X-Payment-Proof header.'
@@ -317,23 +334,6 @@ components:
               error:
                 type: string
                 example: Unauthorized
-  schemas:
-    ChatMessage:
-      type: object
-      required:
-      - role
-      - content
-      properties:
-        role:
-          type: string
-          enum:
-          - user
-          - assistant
-          - system
-          description: Message role
-        content:
-          type: string
-          description: Message content
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
