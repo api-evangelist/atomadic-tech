@@ -1,4 +1,34 @@
 edges:
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/atomadic/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: atomadic
+      version: 0.3.6
+      released: '2026-06-21'
+      released_field: upload_time
+      lapsed: false
+      page: https://pypi.org/project/atomadic/
+      repo_leg: domain:atomadic.tech
+      publisher_leg: email:atomadic.tech
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 - partner_name: MCP Registry
   partner: mcp
   partner_match: register
@@ -14,17 +44,18 @@ edges:
     registered_name: io.github.atomadictech/atomadic-forge
     register_id: io.github.atomadictech/atomadic-forge
     detected_by: sweep-agent-tools.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   mcp_registry:
     servers:
     - io.github.atomadictech/atomadic-forge
+    - tech.atomadic/atomadic
     - tech.atomadic/atomadic-fuse
     - tech.atomadic/atomadic-nexus
-    hosted_remote: 1
+    hosted_remote: 2
     local_package: 3
     transports:
       stdio: 3
-      streamable-http: 1
+      streamable-http: 2
     auth_declared: 0
     catalog_declared: true
     namespace_domains:
@@ -63,39 +94,47 @@ edges:
     matched_domain: atomadic.tech
     matched_by: own-domain
     detected_by: sweep-ai-agents.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
-- partner_name: PyPI
-  partner: pypi
+- partner_name: x402 protocol (live 402 probe)
+  partner: null
   partner_match: register
   type: register
-  direction: provider-built
-  category: official SDK (Python)
-  evidence: https://pypi.org/project/atomadic/
-  channel: package-registry
-  relationship: distribution-channel
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://atomadic.tech/v1/agents/status
+  category: x402 pay-per-call conformance (observed)
   contract_reference:
-    register: PyPI (public registry JSON)
+    register: live x402 probe (unauthenticated request to a documented paid resource + negative control)
+    standard: x402
     spec_file: null
-    language: Python
-    packages:
-    - name: atomadic
-      version: 0.3.6
-      released: '2026-06-21'
-      released_field: upload_time
+    role: x402-resource-server
+    matched_by: repo
+    certified_products:
+    - product: 'x402 resource server: payment challenge observed'
+      product_type: x402 resource server
       lapsed: false
-      page: https://pypi.org/project/atomadic/
-      repo_leg: domain:atomadic.tech
-      publisher_leg: email:atomadic.tech
-      matched_by: domain
-    current: true
-    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
-      24 months'
-    detected_by: sweep-official-sdks.py
-    detected: '2026-10-18'
-  detected_by: sweep-official-sdks.py
-  first_seen: '2026-10-18'
+      observed: '2026-10-21'
+      probe_url: https://atomadic.tech/v1/agents/status
+      probe_method: GET
+      evidence:
+      - header:payment-required
+      negative_control_status: 404
+    probes:
+    - url: https://atomadic.tech/v1/swarm/inbox
+      method: GET
+      status: 200
+    - url: https://atomadic.tech/v1/agents/status
+      method: GET
+      status: 402
+    signal_note: 'conformance OBSERVED, not certified by a body: 402 plus an x402 header or a complete accepts[]
+      body, and a negative control on the same host not challenged; one entry per product type'
+    detected_by: sweep-x402-micropayments.py
+    detected: '2026-10-21'
+  detected_by: sweep-x402-micropayments.py
+  first_seen: '2026-10-21'
 generated: '2026-10-14'
 method: searched
 checked:
@@ -108,5 +147,15 @@ checked:
 - https://registry.npmjs.org
 - https://repo1.maven.org/maven2
 - https://rubygems.org/api/v1
+- https://agentic.market
+- https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources
+- https://app.ampersend.ai/discover
+- https://docs.cdp.coinbase.com/x402/
+- https://docs.x402.org/dev-tools/facilitators
+- https://pay.sh
+- https://www.x402.org/ecosystem
+- https://x402-list.com
+- https://x402.org/members/
+- https://x402scan.com
 source:
 - https://a2aregistry.org/api/agents
